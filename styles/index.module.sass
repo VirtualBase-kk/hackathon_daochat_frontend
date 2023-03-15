@@ -43,3 +43,56 @@
           border-radius: 18px
           background-color: black
           color: white
+    .content
+      width: calc(100% - 80px)
+      height: 100vh
+      .chatHeader
+        height: 80px
+        border-bottom: 1px solid rgba(0,0,0,0.12)
+        display: flex
+        align-items: center
+        justify-content: space-between
+        .chatHeaderLeft
+          display: flex
+          align-items: center
+          padding-left: 30px
+          h1
+            font-size: 20px
+            font-weight: 500
+        .chatHeaderRight
+          display: flex
+          align-items: center
+          .chatHeaderRightLeft
+            font-size: 20px
+            display: flex
+            padding-right: 10px
+            border-right: 1px solid rgba(0,0,0,0.12)
+            .iconWrapper
+              margin: 10px
+          .chatHeaderRightRight
+            padding-left: 20px
+            padding-right: 20px
+            display: flex
+            align-items: center
+            .iconWrapper
+              border-radius: 100px
+              width: 40px
+              height: 40px
+              overflow: hidden
+              display: flex
+              align-items: center
+              justify-content: center
+              .icon
+                display: flex
+                align-items: center
+            .metadata
+              display: flex
+              flex-flow: column
+              margin-left: 20px
+              margin-right: 20px
+              justify-content: center
+              p
+                margin: 0
+                font-size: 16px
+              span
+                font-size: 14px

@@ -3,6 +3,7 @@ import Image from 'next/image'
 import { Inter } from 'next/font/google'
 import styles from "@/styles/index.module.sass"
 import { toSvg } from "jdenticon";
+import {AiOutlineSetting,AiOutlineBell} from "react-icons/ai"
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
@@ -22,14 +23,39 @@ export default function Home() {
                 </div>
                 <div className={styles.iconWrapper}>
                     <div className={styles.space}></div>
-                    <div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("value", 40) }} />
+                    <div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("value1", 40) }} />
                 </div>
                 <div className={styles.iconWrapper}>
                     <div className={styles.space}/>
                     <div className={styles.iconPlus}>＋</div>
                 </div>
             </div>
-            <div className={styles.content}></div>
+            <div className={styles.content}>
+                <div className={styles.chatHeader}>
+                    <div className={styles.chatHeaderLeft}>
+                        <h1>VirtualBase inc.</h1>
+                    </div>
+                    <div className={styles.chatHeaderRight}>
+                        <div className={styles.chatHeaderRightLeft}>
+                            <div className={styles.iconWrapper}>
+                                <AiOutlineSetting />
+                            </div>
+                            <div className={styles.iconWrapper}>
+                                <AiOutlineBell />
+                            </div>
+
+                        </div>
+                        <div className={styles.chatHeaderRightRight}>
+                            <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                            <div className={styles.metadata}>
+                                <p>Issui ikeda</p>
+                                <span>UI/UX Designer</span>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+            </div>
         </div>
     </>
   )
