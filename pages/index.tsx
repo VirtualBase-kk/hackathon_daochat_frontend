@@ -1,8 +1,8 @@
 import Head from 'next/head'
 import Image from 'next/image'
 import { Inter } from 'next/font/google'
-import styles from '@/styles/Home.module.css'
-
+import styles from "@/styles/index.module.sass"
+import { toSvg } from "jdenticon";
 const inter = Inter({ subsets: ['latin'] })
 
 export default function Home() {
@@ -14,7 +14,23 @@ export default function Home() {
         <meta name="viewport" content="width=device-width, initial-scale=1" />
         <link rel="icon" href="/favicon.ico" />
       </Head>
-        <div ></div>
+        <div className={styles.root}>
+            <div className={styles.tab}>
+                <div className={styles.iconWrapper}>
+                    <div className={styles.selected}></div>
+                    <div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("value", 40) }} />
+                </div>
+                <div className={styles.iconWrapper}>
+                    <div className={styles.space}></div>
+                    <div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("value", 40) }} />
+                </div>
+                <div className={styles.iconWrapper}>
+                    <div className={styles.space}/>
+                    <div className={styles.iconPlus}>＋</div>
+                </div>
+            </div>
+            <div className={styles.content}></div>
+        </div>
     </>
   )
 }

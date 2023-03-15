@@ -1,0 +1,46 @@
+@import "./mixin.sass"
+
+.root
+  width: 100vw
+  height: 100vh
+  overflow: scroll
+  +mq(lg)
+    display: flex
+    overflow: scroll
+    .tab
+      width: 80px
+      height: 100vh
+      padding-top: 15px
+      border-right: 1px solid rgba(0,0,0,0.12)
+      .iconWrapper
+        display: flex
+        margin-top: 15px
+        margin-bottom: 15px
+        .space
+          width: 6px
+        .selected
+          width: 6px
+          height: 43.2px
+          background-color: black
+          border-radius: 0px 10px 10px 0px
+        .icon
+          width: 54%
+          margin: auto
+          display: flex
+          align-items: center
+          justify-content: center
+          padding: 2%
+          border: 1px solid #EBEBEB
+          border-radius: 18px
+        .iconPlus
+          width: 54%
+          height: 43.2px
+          margin: auto
+          display: flex
+          align-items: center
+          justify-content: center
+          padding: 2%
+          border: 1px solid #EBEBEB
+          border-radius: 18px
+          background-color: black
+          color: white
