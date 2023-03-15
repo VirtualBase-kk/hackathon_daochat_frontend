@@ -1,0 +1,82 @@
+@import "./mixin.sass"
+.root
+  +mq(lg)
+    height: 100vh
+    overflow-x: scroll
+    display: flex
+    .sp_logo
+      display: none
+    .left
+      width: 55%
+      height: 100vh
+      background-color: black
+      position: relative
+      top: 0
+      left: 0
+      .bg_image
+        position: absolute
+        top: 0
+        left: 0
+        object-fit: cover
+        height: 100vh
+        width: 100%
+      .logo
+        position: absolute
+        top: 25px
+        left: 30px
+      .auth_text
+        position: relative
+        top: 50%
+        left: 50%
+        transform: translate(-50%, -50%)
+        -webkit-transform: translate(-50%, -50%)
+        -ms-transform: translate(-50%, -50%)
+      .company
+        position: absolute
+        bottom: 0
+        left: 25px
+        color: white
+
+    .right
+      width: 45%
+      display: flex
+      align-items: center
+      justify-content: center
+      .content
+        width: 70%
+        p
+          font-size: 16px
+        button
+          background: linear-gradient(91.02deg, #7D2951 0%, #1D3B88 100%)
+          color: white
+          border: 0
+          width: 100%
+          font-size: 18px
+          padding: 15px
+          border-radius: 5px
+  +mq(md)
+    .sp_logo
+      position: absolute
+      top: 25px
+      left: 25px
+      color: black
+    .left
+      display: none
+    .right
+      width: 100%
+      height: 100vh
+      display: flex
+      align-items: center
+      justify-content: center
+      .content
+        width: 70%
+        p
+          font-size: 16px
+        button
+          background: linear-gradient(91.02deg, #7D2951 0%, #1D3B88 100%)
+          color: white
+          border: 0
+          width: 100%
+          font-size: 18px
+          padding: 15px
+          border-radius: 5px
