@@ -5,7 +5,8 @@ import styles from "@/styles/index.module.sass"
 import { toSvg } from "jdenticon";
 import {AiOutlineSetting,AiOutlineBell} from "react-icons/ai"
 const inter = Inter({ subsets: ['latin'] })
-
+import {BsFileEarmark,BsChat} from "react-icons/bs"
+import {RiArrowDownSLine} from "react-icons/ri"
 export default function Home() {
   return (
     <>
@@ -54,7 +55,50 @@ export default function Home() {
                         </div>
                     </div>
                 </div>
+                <div className={styles.chatBody}>
+                    <div className={styles.chatBodyLeft}>
+                        <div className={styles.chatBodyLeftItem}>
+                            <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>タスク</span></span>
+                            <ul>
+                                <li><BsFileEarmark></BsFileEarmark><span>トイレの掃除</span></li>
+                                <li><BsFileEarmark></BsFileEarmark><span>コーヒーメーカーの設置をああああああ</span></li>
+                                <li><BsFileEarmark></BsFileEarmark><span>今度の飲み会の幹事をあああああああああ</span></li>
+                            </ul>
+                        </div>
+                        <div className={styles.chatBodyLeftItem}>
+                            <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>チャットチャンネル</span></span>
+                            <ul>
+                                <li>＃<span>トイレの掃除</span></li>
+                                <li>＃<span>コーヒーメーカーの設置をああああああ</span></li>
+                                <li>＃<span>今度の飲み会の幹事をあああああああああ</span></li>
+                            </ul>
+                        </div>
+                        <div className={styles.chatBodyLeftItem}>
+                            <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>進行中のディスカッション</span></span>
+                            <ul>
+                                <li>＃<span>トイレの掃除</span></li>
+                                <li>＃<span>コーヒーメーカーの設置をああああああ</span></li>
+                                <li>＃<span>今度の飲み会の幹事をあああああああああ</span></li>
+                            </ul>
+                        </div>
+                        <div className={styles.chatBodyLeftItem}>
+                            <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>終了済みのディスカッション</span></span>
+                            <ul>
+                                <li>＃<span>トイレの掃除</span></li>
+                                <li>＃<span>コーヒーメーカーの設置をああああああ</span></li>
+                                <li>＃<span>今度の飲み会の幹事をあああああああああ</span></li>
+                            </ul>
+                        </div>
+                    </div>
+                    <div className={styles.chatBodyRight}>
+                        <div className={styles.chatBodyRightHeader}>
+                            <BsChat></BsChat>
+                            <span>社内部活の予算の上限についての決定</span>
+                        </div>
+                        <div className={styles.chatBodyRightChatSpace}></div>
+                    </div>
 
+                </div>
             </div>
         </div>
     </>

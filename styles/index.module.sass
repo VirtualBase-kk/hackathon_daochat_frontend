@@ -12,6 +12,8 @@
       height: 100vh
       padding-top: 15px
       border-right: 1px solid rgba(0,0,0,0.12)
+      overflow: scroll
+      box-sizing: border-box
       .iconWrapper
         display: flex
         margin-top: 15px
@@ -46,12 +48,14 @@
     .content
       width: calc(100% - 80px)
       height: 100vh
+      overflow: scroll
       .chatHeader
         height: 80px
         border-bottom: 1px solid rgba(0,0,0,0.12)
         display: flex
         align-items: center
         justify-content: space-between
+        box-sizing: border-box
         .chatHeaderLeft
           display: flex
           align-items: center
@@ -96,3 +100,54 @@
                 font-size: 16px
               span
                 font-size: 14px
+
+      .chatBody
+        width: 100%
+        height: calc(100% - 80px)
+        display: flex
+        box-sizing: border-box
+        .chatBodyLeft
+          width: 240px
+          height: 100%
+          border-right: 1px solid rgba(0,0,0,0.12)
+          padding: 20px
+          box-sizing: border-box
+          overflow: scroll
+          .chatBodyLeftItem
+            .itemTitle
+              font-size: 12px
+              color:  rgba(0,0,0,0.8)
+              display: flex
+              align-items: center
+              span
+                margin-left: 10px
+            ul
+              list-style: none
+              padding: 0
+              margin-bottom: 30px
+              li
+                width: 100%
+                margin: 15px 0
+                font-size: 14px
+                color:  rgba(0,0,0,0.8)
+                overflow: hidden
+                text-overflow: ellipsis
+                white-space: nowrap
+                span
+                  margin-left: 10px
+        .chatBodyRight
+          width: calc(100% - 240px)
+          .chatBodyRightHeader
+            width: 100%
+            height: 73px
+            border-bottom: 1px solid rgba(0,0,0,0.12)
+            font-size: 18px
+            display: flex
+            align-items: center
+            padding-left: 20px
+            box-sizing: border-box
+            span
+              margin-left: 10px
+          .chatBodyRightChatSpace
+            width: 100%
+            height: calc(100% - 73px)
