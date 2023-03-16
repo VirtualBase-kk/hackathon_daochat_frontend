@@ -42,7 +42,7 @@ export const AuthContextProvider = (props: any) => {
         try {
             await Auth.signUp({
                 username: id,
-                password:uuidv4(),
+                password:uuidv4()
             });
             return {
                 status: true,
@@ -69,7 +69,7 @@ export const AuthContextProvider = (props: any) => {
     const signIn = async (id: string,jwt:string) => {
         try {
             await signOut();
-            const challenge = await Auth.signIn(id);
+            const challenge = await Auth.signIn(id,"");
             if (challenge.challengeName === 'CUSTOM_CHALLENGE') {
                 const user = await Auth.sendCustomChallengeAnswer(challenge, jwt);
                 console.log(user);

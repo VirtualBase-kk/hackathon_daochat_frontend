@@ -3,6 +3,7 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/hackathon_daochat-frontend.iml" filepath="$PROJECT_DIR$/.idea/hackathon_daochat-frontend.iml" />
+      <module fileurl="file://$PROJECT_DIR$/../k3_daokun_backend/.idea/k3_daokun_backend.iml" filepath="$PROJECT_DIR$/../k3_daokun_backend/.idea/k3_daokun_backend.iml" />
     </modules>
   </component>
 </project>
