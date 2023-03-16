@@ -166,9 +166,9 @@ export default function Home() {
                                 <span>詳細を表示</span>
                                 </div>
                                 <div className={styles.voteItem}>
-                                    <div className={styles.voteChoice}><span>1.ほげほげほげほげ</span><div className={styles.voteChoiceAgree} style={{width:"20%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"80%"}}></div></div>
-                                    <div className={styles.voteChoice}><span>2.ああああああああ</span><div className={styles.voteChoiceAgree} style={{width:"40%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"60%"}}></div></div>
-                                    <div className={styles.voteChoice}><span>3.いいいいいいいい</span><div className={styles.voteChoiceAgree} style={{width:"30%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"80%"}}></div></div>
+                                    <div className={styles.voteChoice}><span>1.ほげほげほげほげ<div>+</div></span><div className={styles.voteChoiceAgree} style={{width:"20%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"80%"}}></div></div>
+                                    <div className={styles.voteChoice}><span>2.ああああああああ<div>+</div></span><div className={styles.voteChoiceAgree} style={{width:"40%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"60%"}}></div></div>
+                                    <div className={styles.voteChoice}><span>3.いいいいいいいい<div>+</div></span><div className={styles.voteChoiceAgree} style={{width:"30%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"80%"}}></div></div>
                                 </div>
                             </div>
 
