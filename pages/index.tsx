@@ -5,7 +5,7 @@ import styles from "@/styles/index.module.sass"
 import { toSvg } from "jdenticon";
 import {AiOutlineSetting,AiOutlineBell} from "react-icons/ai"
 const inter = Inter({ subsets: ['latin'] })
-import {BsFileEarmark,BsChat} from "react-icons/bs"
+import {BsFileEarmark,BsChat,BsSend} from "react-icons/bs"
 import {RiArrowDownSLine} from "react-icons/ri"
 export default function Home() {
   return (
@@ -95,7 +95,76 @@ export default function Home() {
                             <BsChat></BsChat>
                             <span>社内部活の予算の上限についての決定</span>
                         </div>
-                        <div className={styles.chatBodyRightChatSpace}></div>
+                        <div className={styles.chatBodyRightChatSpace}>
+                            <div className={styles.chatBody}>
+                                <div className={styles.chatItem}>
+                                    <div className={styles.chatItemHeader}>
+                                        <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                        <p>issui ikeda</p>
+                                        <span>12:42 PM</span>
+                                    </div>
+                                    <div className={styles.chatItemBody}>
+                                        <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
+                                    </div>
+                                </div>
+                                <div className={styles.chatItem}>
+                                    <div className={styles.chatItemHeader}>
+                                        <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                        <p>issui ikeda</p>
+                                        <span>12:42 PM</span>
+                                    </div>
+                                    <div className={styles.chatItemBody}>
+                                        <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
+                                    </div>
+                                </div>
+                                <div className={styles.chatItem}>
+                                    <div className={styles.chatItemHeader}>
+                                        <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                        <p>issui ikeda</p>
+                                        <span>12:42 PM</span>
+                                    </div>
+                                    <div className={styles.chatItemBody}>
+                                        <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
+                                    </div>
+                                </div>
+                                <div className={styles.chatItem}>
+                                    <div className={styles.chatItemHeader}>
+                                        <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                        <p>issui ikeda</p>
+                                        <span>12:42 PM</span>
+                                    </div>
+                                    <div className={styles.chatItemBody}>
+                                        <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
+                                    </div>
+                                </div>
+                                <div className={styles.chatItem}>
+                                    <div className={styles.chatItemHeader}>
+                                        <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                        <p>issui ikeda</p>
+                                        <span>12:42 PM</span>
+                                    </div>
+                                    <div className={styles.chatItemBody}>
+                                        <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。あああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
+                                    </div>
+                                </div>
+                                <div className={styles.chatItem}>
+                                    <div className={styles.chatItemHeader}>
+                                        <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                        <p>issui ikeda</p>
+                                        <span>12:42 PM</span>
+                                    </div>
+                                    <div className={styles.chatItemBody}>
+                                        <p>メアド認証ができるパターンメアド入力 → Cognito認証 → ログイン<br/>
+                                            メアド入力 → Cognito認証 → カスタム認証 → ログイン<br/>
+                                            メタマスク認証ができるパターンメタマスクログイン → カスタム認証 → ログイン<br/></p>
+                                    </div>
+                                </div>
+                            </div>
+                            <div className={styles.chatInput}>
+                                <input className={styles.chatInputInput}/>
+                                <button><BsSend></BsSend></button>
+                            </div>
+                        </div>
                     </div>
 
                 </div>
