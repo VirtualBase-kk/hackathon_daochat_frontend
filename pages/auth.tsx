@@ -5,6 +5,8 @@ import {toast} from "react-toastify";
 import 'react-toastify/dist/ReactToastify.css';
 import {useGetJWT} from "@/src/functions/auth/getJWT";
 import {AuthContext} from "@/src/context/authContext";
+import {useRouter} from "next/router";
+import {LoadingContext} from "@/src/context/loadingContext";
 
 export default function Auth (){
     const [message,setMessage] = useState<string>("")
@@ -14,6 +16,8 @@ export default function Auth (){
     const [signature,setSignature] = useState<string>("")
     const [jwt,setJWT] = useState<string>("")
     const auth = useContext(AuthContext)
+    const router = useRouter()
+    const loading = useContext(LoadingContext)
     useGetSignMessage(walletAddress,setMessage,setId)
     useGetJWT(signature,id,setJWT,setUserId)
 
@@ -26,7 +30,9 @@ export default function Auth (){
 
                 }
                 await auth.signIn(userId,jwt)
+                loading.setLoading(false)
                 toast("ログインしました")
+                router.push("/")
             })()
         }
     },[jwt])
@@ -50,6 +56,7 @@ export default function Auth (){
         // @ts-ignore
         const accounts = await globalThis.window.ethereum.request({ method: 'eth_requestAccounts' });
         if (accounts.length !== 0) {
+            loading.setLoading(true)
             setWalletAddress(accounts[0])
         } else {
             toast.error("連携に失敗しました")
