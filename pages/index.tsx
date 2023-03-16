@@ -41,16 +41,12 @@ export default function Home() {
                             <div className={styles.iconWrapper}>
                                 <AiOutlineSetting />
                             </div>
-                            <div className={styles.iconWrapper}>
-                                <AiOutlineBell />
-                            </div>
-
                         </div>
                         <div className={styles.chatHeaderRightRight}>
                             <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
                             <div className={styles.metadata}>
                                 <p>Issui ikeda</p>
-                                <span>UI/UX Designer</span>
+                                <span>スコア：<span className={styles.score}>0pt</span></span>
                             </div>
                         </div>
                     </div>
@@ -161,9 +157,21 @@ export default function Home() {
                                 </div>
                             </div>
                             <div className={styles.chatInput}>
-                                <input className={styles.chatInputInput}/>
+                                <input className={styles.chatInputInput} placeholder={"ここにテキストを入力"}/>
                                 <button><BsSend></BsSend></button>
                             </div>
+                            <div className={styles.vote}>
+                                <div className={styles.voteHeader}>
+                                <h1>進行中の投票</h1>
+                                <span>詳細を表示</span>
+                                </div>
+                                <div className={styles.voteItem}>
+                                    <div className={styles.voteChoice}><span>1.ほげほげほげほげ</span><div className={styles.voteChoiceAgree} style={{width:"20%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"80%"}}></div></div>
+                                    <div className={styles.voteChoice}><span>2.ああああああああ</span><div className={styles.voteChoiceAgree} style={{width:"40%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"60%"}}></div></div>
+                                    <div className={styles.voteChoice}><span>3.いいいいいいいい</span><div className={styles.voteChoiceAgree} style={{width:"30%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"80%"}}></div></div>
+                                </div>
+                            </div>
+
                         </div>
                     </div>
 
