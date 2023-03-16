@@ -47,6 +47,7 @@ export default function Auth (){
                     method: 'personal_sign',
                     params: [msg, from, msg],
                 });
+
                 setSignature(sign)
             }
         })()
@@ -55,6 +56,11 @@ export default function Auth (){
     const connectWallet = async () => {
         // @ts-ignore
         const accounts = await globalThis.window.ethereum.request({ method: 'eth_requestAccounts' });
+        // @ts-ignore
+        await globalThis.window.ethereum.request({
+            method: 'wallet_switchEthereumChain',
+            params: [{chainId:"0x250"}],
+        })
         if (accounts.length !== 0) {
             loading.setLoading(true)
             setWalletAddress(accounts[0])
