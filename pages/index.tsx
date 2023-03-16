@@ -5,6 +5,7 @@ import styles from "@/styles/index.module.sass"
 import { toSvg } from "jdenticon";
 import {AiOutlineSetting,AiOutlineBell,AiOutlineClose} from "react-icons/ai"
 const inter = Inter({ subsets: ['latin'] })
+import Web3 from "web3"
 import {BsFileEarmark,BsChat,BsSend} from "react-icons/bs"
 import {RiArrowDownSLine} from "react-icons/ri"
 import {useContext, useEffect, useState} from "react";
@@ -13,6 +14,7 @@ import {useRouter} from "next/router";
 import {useGetOrganisation} from "@/src/functions/user/getOrganisation";
 import {LoadingContext} from "@/src/context/loadingContext";
 import {useCreateOrg} from "@/src/functions/admin/createOrganisation";
+import {toast} from "react-toastify";
 export default function Home() {
     const auth = useContext(AuthContext)
     const loading = useContext(LoadingContext)
@@ -37,8 +39,25 @@ export default function Home() {
     },[auth.isLogin])
 
     const createOrg = async () => {
-        if (createOrgFunc.length !== 0) {
-            const resp = await createOrgFunc(auth,createOrgName)
+        if (createOrgName.length !== 0) {
+            loading.setLoading(true)
+            try {
+                const resp = await createOrgFunc.getBin(auth,createOrgName)
+                // @ts-ignore
+                const accounts = await globalThis.window?.ethereum.request({ method: 'eth_requestAccounts' });
+                //@ts-ignore
+                const web3 = new Web3(globalThis.window?.ethereum)
+                const r = await web3.eth.sendTransaction({
+                    from: accounts[0],
+                    data: resp.bin
+                })
+                r.contractAddress
+                await createOrgFunc.setContractAddress(auth,resp.id,String(r.contractAddress))
+            } catch {
+                toast.error("失敗しました")
+            }
+            loading.setLoading(false)
+            globalThis.window.reload()
         }
 
     }
