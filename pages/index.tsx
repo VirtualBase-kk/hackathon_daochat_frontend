@@ -29,6 +29,8 @@ import { v4 as uuidv4 } from 'uuid';
 import {useCreateDiscussion} from "@/src/functions/chat/addDiscussion";
 import {useGetVotes} from "@/src/functions/chat/getVote";
 import {useChangeTodo} from "@/src/functions/chat/changeTodo";
+import {GetChat} from "@/src/functions/chat/getChat";
+import {PostChat} from "@/src/functions/chat/postChat";
 export default function Home() {
     const auth = useContext(AuthContext)
     const loading = useContext(LoadingContext)
@@ -323,6 +325,30 @@ export default function Home() {
         }
     },[selectedTodoIndex])
 
+    const [inputChatText,setInputChatText] = useState<string>("")
+
+    const sendChat = async () => {
+        if (inputChatText.length !== 0) {
+            await PostChat(auth,selectedRoom,inputChatText)
+        }
+    }
+
+    const [iId,setIId] = useState<any>()
+
+    useEffect(()=>{
+        clearInterval(iId);
+        if (!isTodo && selectedRoom.length !== 0) {
+            const intervalId = setInterval(async() => {
+                if (isTodo) {
+                    clearInterval(intervalId)
+                }
+                const resp = await GetChat(auth,selectedRoom)
+            }, 10000);
+            setIId(intervalId)
+        }
+        return clearInterval(iId);
+    },[isTodo])
+
     return (
     <>
       <Head>
@@ -575,75 +601,24 @@ export default function Home() {
                                                 <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
                                             </div>
                                         </div>
-                                        <div className={styles.chatItem}>
-                                            <div className={styles.chatItemHeader}>
-                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                                <p>issui ikeda</p>
-                                                <span>12:42 PM</span>
-                                            </div>
-                                            <div className={styles.chatItemBody}>
-                                                <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
-                                            </div>
-                                        </div>
-                                        <div className={styles.chatItem}>
-                                            <div className={styles.chatItemHeader}>
-                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                                <p>issui ikeda</p>
-                                                <span>12:42 PM</span>
-                                            </div>
-                                            <div className={styles.chatItemBody}>
-                                                <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
-                                            </div>
-                                        </div>
-                                        <div className={styles.chatItem}>
-                                            <div className={styles.chatItemHeader}>
-                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                                <p>issui ikeda</p>
-                                                <span>12:42 PM</span>
-                                            </div>
-                                            <div className={styles.chatItemBody}>
-                                                <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
-                                            </div>
-                                        </div>
-                                        <div className={styles.chatItem}>
-                                            <div className={styles.chatItemHeader}>
-                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                                <p>issui ikeda</p>
-                                                <span>12:42 PM</span>
-                                            </div>
-                                            <div className={styles.chatItemBody}>
-                                                <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。あああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
-                                            </div>
-                                        </div>
-                                        <div className={styles.chatItem}>
-                                            <div className={styles.chatItemHeader}>
-                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                                <p>issui ikeda</p>
-                                                <span>12:42 PM</span>
-                                            </div>
-                                            <div className={styles.chatItemBody}>
-                                                <p>メアド認証ができるパターンメアド入力 → Cognito認証 → ログイン<br/>
-                                                    メアド入力 → Cognito認証 → カスタム認証 → ログイン<br/>
-                                                    メタマスク認証ができるパターンメタマスクログイン → カスタム認証 → ログイン<br/></p>
-                                            </div>
-                                        </div>
                                     </div>
                                     <div className={styles.chatInput}>
-                                        <input className={styles.chatInputInput} placeholder={"ここにテキストを入力"}/>
-                                        <button><BsSend></BsSend></button>
+                                        <input className={styles.chatInputInput} placeholder={"ここにテキストを入力"} onChange={(e)=>{setInputChatText(e.target.value)}}/>
+                                        <button onClick={()=>{sendChat()}}><BsSend></BsSend></button>
                                     </div>
-                                    <div className={styles.vote}>
-                                        <div className={styles.voteHeader}>
-                                            <h1>進行中の投票</h1>
-                                            <span>詳細を表示</span>
+                                    {
+                                        room!==undefined&&room[selectedRoomIndex].isDiscussion&&<div className={styles.vote}>
+                                            <div className={styles.voteHeader}>
+                                                <h1>進行中の投票</h1>
+                                                <span>詳細を表示</span>
+                                            </div>
+                                            <div className={styles.voteItem}>
+                                                <div className={styles.voteChoice}><span>1.ほげほげほげほげ<div>+</div></span></div>
+                                                <div className={styles.voteChoice}><span>2.ああああああああ<div>+</div></span></div>
+                                                <div className={styles.voteChoice}><span>3.いいいいいいいい<div>+</div></span></div>
+                                            </div>
                                         </div>
-                                        <div className={styles.voteItem}>
-                                            <div className={styles.voteChoice}><span>1.ほげほげほげほげ<div>+</div></span></div>
-                                            <div className={styles.voteChoice}><span>2.ああああああああ<div>+</div></span></div>
-                                            <div className={styles.voteChoice}><span>3.いいいいいいいい<div>+</div></span></div>
-                                        </div>
-                                    </div>
-
+                                    }
                                 </div>
                             </div>
                         ):(
