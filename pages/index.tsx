@@ -23,7 +23,10 @@ import {useGetOrg} from "@/src/functions/chat/getOrgName";
 import {useAddMember} from "@/src/functions/admin/addMember";
 import {useGetTodo} from "@/src/functions/chat/getTodo";
 import {useAddTodo} from "@/src/functions/chat/addTodo";
-
+import {useGetRoom} from "@/src/functions/chat/getRoomList";
+import {useCreateRoom} from "@/src/functions/chat/createRoom";
+import { v4 as uuidv4 } from 'uuid';
+import {useCreateDiscussion} from "@/src/functions/chat/addDiscussion";
 export default function Home() {
     const auth = useContext(AuthContext)
     const loading = useContext(LoadingContext)
@@ -79,6 +82,28 @@ export default function Home() {
 
     useGetTodo(auth,selectedOrg,setTodo)
 
+    const [showAddRoom,setShowAddRoom] = useState<boolean>(false)
+
+    const [selectedRoom,setSelectedRoom] = useState<string>("")
+
+    const [room,setRoom] = useState<{id:string,name:string,isDiscussion:boolean}[]>()
+
+    const [roomTitle,setRoomTitle] = useState<string>("")
+
+    const [showDiscussionForm,setShowDiscussionForm] = useState<boolean>(true)
+
+    const [choice,setChoice] = useState<string[]>(["",""])
+
+    const addRoomFunc = useCreateRoom()
+
+    const [end,setEnd] = useState<string>("")
+
+    const [description,setDescription] = useState<string>("")
+
+    const createDiscussionFunc = useCreateDiscussion()
+
+    useGetRoom(auth,selectedOrg,setRoom)
+
     useEffect(()=>{
         if (!auth.isLogin) {
             router.push("/auth")
@@ -105,6 +130,10 @@ export default function Home() {
             setUserNameTmp(user?.name?user.name:user?.walletAddress)
         }
     },[user])
+
+    useEffect(()=>{
+        room!==undefined && room.length !== 0 && setSelectedRoom(room[0].id)
+    },[room])
 
 
     const createOrg = async () => {
@@ -170,7 +199,72 @@ export default function Home() {
         }
     }
 
-  return (
+    const addRoom = async() => {
+        if (roomTitle.length !== 0) {
+            const resp = await addRoomFunc(auth,selectedOrg,roomTitle)
+            toast("作成しました")
+            setShowAddRoom(false)
+            const currentRooms = room
+            currentRooms?.push({
+                id: resp.id,
+                name: roomTitle,
+                isDiscussion: false
+            })
+            setRoom(currentRooms)
+        }
+    }
+
+    const addChoice = () => {
+        const currentChoice = choice.concat()
+        currentChoice.push("")
+        setChoice(currentChoice)
+    }
+
+    const deleteChoice = () => {
+        const currentChoice = choice.concat()
+        currentChoice.splice(-1,1)
+        setChoice(currentChoice)
+    }
+
+    const editChoice = (index:number,text:string) => {
+        const currentChoice = choice.concat()
+        currentChoice[index] = text
+        setChoice(currentChoice)
+    }
+
+    const addDiscussion = async () => {
+        if (roomTitle.length !== 0 && end.length !== 0 && choice.length !== 0) {
+            const endTs = (new Date(end)).getTime()
+            const choiceReq:{id:string,title:string}[] = []
+            choice.forEach(item=>{
+                choiceReq.push({
+                    id: uuidv4(),
+                    title: item
+                })
+            })
+            const resp = await createDiscussionFunc(auth,selectedOrg,roomTitle,description,choiceReq,endTs)
+            const currentRooms = room
+            currentRooms?.push({
+                id: resp.id,
+                name: roomTitle,
+                isDiscussion: true
+            })
+            // @ts-ignore
+            const accounts = await globalThis.window?.ethereum.request({ method: 'eth_requestAccounts' });
+            //@ts-ignore
+            const web3 = new Web3(globalThis.window?.ethereum)
+            const r = await web3.eth.sendTransaction({
+                from: accounts[0],
+                data: resp.message,
+                to: org?.contractAddress
+            })
+            toast("追加しました")
+            setShowDiscussionForm(false)
+            setRoom(currentRooms)
+        }
+    }
+
+    return (
     <>
       <Head>
         <title>DAOCHAT</title>
@@ -317,23 +411,86 @@ export default function Home() {
                                 </ul>
                             </div>
                             <div className={styles.chatBodyLeftItem}>
-                                <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>チャットチャンネル</span><span>+</span></span>
+                                <span className={styles.itemTitle} onClick={()=>{setShowAddRoom(true)}}><RiArrowDownSLine></RiArrowDownSLine><span>チャットチャンネル</span><span>+</span></span>
                                 <ul>
-                                    <li className={styles.isSelected}>＃<span>トイレの掃除</span></li>
-                                    <li>＃<span>コーヒーメーカーの設置をああああああ</span></li>
-                                    <li>＃<span>今度の飲み会の幹事をあああああああああ</span></li>
+                                    {
+                                        room?.map(item=> !item.isDiscussion&& <li className={item.id===selectedRoom ? styles.isSelected:""} key={item.id}>＃<span>{item.name}</span></li>)
+                                    }
+                                    {
+                                        showAddRoom&&<><div className={styles.changeUserNameBg}>
+                                            <div className={styles.changeUserNameWrapper}>
+                                                <div className={styles.closeButtonWrapper}　onClick={()=>{setShowAddRoom(false)}}>
+                                                    <div className={styles.closeButton}>
+                                                        <AiOutlineClose onClick={()=>{setShowAddRoom(false)}}></AiOutlineClose>
+                                                    </div>
+                                                </div>
+                                                <div className={styles.changeUserNameModal} style={{height:"260px"}}>
+                                                    <div className={styles.changeUserNameHeader}>
+                                                        <span>ルームを追加</span>
+                                                    </div>
+                                                    <div className={styles.body}>
+                                                        <p className={styles.label}>タイトル</p>
+                                                        <input placeholder={"タイトルを入力してください"}  onChange={(e)=>{setRoomTitle(e.target.value)}}/>
+                                                        <div className={styles.buttonWrapper}>
+                                                            <button className={styles.cancelButton} onClick={()=>{setShowAddRoom(false)}}>キャンセル</button>
+                                                            <button className={styles.nextButton} onClick={()=>{addRoom()}}>追加</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div></div></>
+                                    }
                                 </ul>
                             </div>
                             <div className={styles.chatBodyLeftItemDiscussion}>
-                                <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>進行中のディスカッション</span><span>+</span></span>
+                                <span className={styles.itemTitle} onClick={()=>{setShowDiscussionForm(true)}}><RiArrowDownSLine></RiArrowDownSLine><span>進行中のディスカッション</span><span>+</span></span>
                                 <ul>
                                     <li className={styles.isSelected}><span className={styles.text}>トイレの掃除</span><span className={styles.tagActive}>未投票</span></li>
                                     <li><span className={styles.text}>コーヒーメーカーの設置をああああああ</span><span className={styles.tagPending}>未投票</span></li>
                                     <li><span className={styles.text}>今度の飲み会の幹事をあああああああああ</span><span className={styles.tagPending}>検討中</span></li>
                                 </ul>
+                                {
+                                    showDiscussionForm&&<><div className={styles.changeUserNameBg}>
+                                        <div className={styles.changeUserNameWrapper}>
+                                            <div className={styles.closeButtonWrapper}　onClick={()=>{setShowDiscussionForm(false)}}>
+                                                <div className={styles.closeButton}>
+                                                    <AiOutlineClose onClick={()=>{setShowDiscussionForm(false)}}></AiOutlineClose>
+                                                </div>
+                                            </div>
+                                            <div className={styles.changeUserNameModal} style={{height:"520px",overflow:"scroll"}}>
+                                                <div className={styles.changeUserNameHeader}>
+                                                    <span>ディスカッションを追加</span>
+                                                </div>
+                                                <div className={styles.body}>
+                                                    <p className={styles.label}>タイトル</p>
+                                                    <input placeholder={"タイトルを入力してください"}  onChange={(e)=>{setRoomTitle(e.target.value)}}/>
+                                                    <p className={styles.label}>期限</p>
+                                                    <input type={"datetime-local"} onChange={(e)=>{setEnd(e.target.value)}}/>
+                                                    <p>説明</p>
+                                                    <textarea onChange={(e)=>{setDescription(e.target.value)}}></textarea>
+                                                    {
+                                                        choice.map((item,index)=>{
+                                                            return <><p className={styles.label}>選択肢</p>
+                                                            <input placeholder={"選択肢を入力してください"} value={item} onChange={(e)=>{editChoice(index,e.target.value)}}/> </>
+                                                        })
+                                                    }
+
+                                                    <p className={styles.label}>選択肢</p>
+                                                    <input placeholder={"選択肢を入力してください"}  onChange={(e)=>{setRoomTitle(e.target.value)}}/>
+                                                    <div className={styles.buttonWrapper}>
+                                                        <button className={styles.cancelButton} onClick={()=>{deleteChoice()}}>選択肢を削除</button>
+                                                        <button className={styles.cancelButton} onClick={()=>{addChoice()}}>選択肢を追加</button>
+                                                    </div>
+                                                    <div className={styles.buttonWrapper}>
+                                                        <button className={styles.cancelButton} onClick={()=>{setShowDiscussionForm(false)}}>キャンセル</button>
+                                                        <button className={styles.nextButton} onClick={()=>{addDiscussion()}}>追加</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div></div></>
+                                }
                             </div>
                             <div className={styles.chatBodyLeftItemDiscussion}>
-                                <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>終了済みのディスカッション</span><span>+</span></span>
+                                <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>終了済みのディスカッション</span></span>
                                 <ul>
                                     <li className={styles.isSelected}><span className={styles.text}>トイレの掃除</span><span className={styles.tagActive}>未投票</span></li>
                                     <li><span className={styles.text}>コーヒーメーカーの設置をああああああ</span><span className={styles.tagPending}>未投票</span></li>
@@ -421,9 +578,9 @@ export default function Home() {
                                         <span>詳細を表示</span>
                                     </div>
                                     <div className={styles.voteItem}>
-                                        <div className={styles.voteChoice}><span>1.ほげほげほげほげ<div>+</div></span><div className={styles.voteChoiceAgree} style={{width:"20%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"80%"}}></div></div>
-                                        <div className={styles.voteChoice}><span>2.ああああああああ<div>+</div></span><div className={styles.voteChoiceAgree} style={{width:"40%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"60%"}}></div></div>
-                                        <div className={styles.voteChoice}><span>3.いいいいいいいい<div>+</div></span><div className={styles.voteChoiceAgree} style={{width:"30%"}}></div><div className={styles.voteChoiceNotAgree} style={{width:"80%"}}></div></div>
+                                        <div className={styles.voteChoice}><span>1.ほげほげほげほげ<div>+</div></span></div>
+                                        <div className={styles.voteChoice}><span>2.ああああああああ<div>+</div></span></div>
+                                        <div className={styles.voteChoice}><span>3.いいいいいいいい<div>+</div></span></div>
                                     </div>
                                 </div>
 
