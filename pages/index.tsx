@@ -15,14 +15,26 @@ import {useGetOrganisation} from "@/src/functions/user/getOrganisation";
 import {LoadingContext} from "@/src/context/loadingContext";
 import {useCreateOrg} from "@/src/functions/admin/createOrganisation";
 import {toast} from "react-toastify";
+import {useGetUser} from "@/src/functions/user/getUser";
+import {useGetPoint} from "@/src/functions/user/getPoint";
 export default function Home() {
     const auth = useContext(AuthContext)
     const loading = useContext(LoadingContext)
     const router = useRouter()
 
-    const [UserOrganisation,setUserOrganisation] = useState<string[]>([])
+    const [UserOrganisation,setUserOrganisation] = useState<string[]>()
+
+    const [selectedOrg,setSelectedOrg] = useState<string>("")
 
     useGetOrganisation(auth,setUserOrganisation)
+
+    const [user,setUser] = useState<{walletAddress:string,name:string}>()
+
+    useGetUser(auth,setUser)
+
+    const [point,setPoint] = useState<number>(0)
+
+    useGetPoint(auth,setPoint,selectedOrg)
 
     const [createOrgName,setCreateOrgName] = useState<string>("")
 
@@ -37,6 +49,13 @@ export default function Home() {
             //loading.setLoading(true)
         }
     },[auth.isLogin])
+
+    useEffect(()=>{
+        if (UserOrganisation !== undefined) {
+            loading.setLoading(false)
+            setSelectedOrg(UserOrganisation[0].length !== 0?UserOrganisation[0]:"")
+        }
+    },[UserOrganisation])
 
     const createOrg = async () => {
         if (createOrgName.length !== 0) {
@@ -72,14 +91,14 @@ export default function Home() {
       </Head>
         <div className={styles.root}>
             <div className={styles.tab}>
-                <div className={styles.iconWrapper}>
-                    <div className={styles.selected}></div>
-                    <div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("value", 40) }} />
-                </div>
-                <div className={styles.iconWrapper}>
-                    <div className={styles.space}></div>
-                    <div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("value1", 40) }} />
-                </div>
+                {
+                    UserOrganisation?.map((item)=>{
+                        return <div className={styles.iconWrapper} key={item}>
+                            <div className={selectedOrg === item ? styles.selected:""}></div>
+                            <div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg(item, 40) }} />
+                        </div>
+                    })
+                }
                 <div className={styles.iconWrapper} onClick={()=>{setShowCreateOrgModal(true)}}>
                     <div className={styles.space}/>
                     <div className={styles.iconPlus}>＋</div>
@@ -97,10 +116,10 @@ export default function Home() {
                             </div>
                         </div>
                         <div className={styles.chatHeaderRightRight}>
-                            <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                            <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg(user?.walletAddress, 50) }} /></div>
                             <div className={styles.metadata}>
-                                <p>Issui ikeda</p>
-                                <span>スコア：<span className={styles.score}>0pt</span></span>
+                                <p>{user?.name?user.name:user?.walletAddress.slice(0,10)+"..."}</p>
+                                <span>スコア：<span className={styles.score}>{point}pt</span></span>
                             </div>
                         </div>
                     </div>
