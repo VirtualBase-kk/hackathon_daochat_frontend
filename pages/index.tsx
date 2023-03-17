@@ -291,6 +291,8 @@ export default function Home() {
 
     useGetVotes(auth,setVote,room)
 
+    const [selectedRoomIndex,setSelectedRoomIndex] = useState<number>(0)
+
     useEffect(()=>{
         console.log(vote)
     },[vote])
@@ -320,15 +322,6 @@ export default function Home() {
             )
         }
     },[selectedTodoIndex])
-
-    const getUser = async (userId:string) => {
-        if (userId.length !== 0) {
-            const resp = await GetUserById(auth,userId)
-            return {name:resp.name,icon:resp.walletAddress}
-        } else {
-            return {name:"-",icon:""}
-        }
-    }
 
     return (
     <>
@@ -480,7 +473,7 @@ export default function Home() {
                                 <span className={styles.itemTitle} onClick={()=>{setShowAddRoom(true)}}><RiArrowDownSLine></RiArrowDownSLine><span>チャットチャンネル</span><span>+</span></span>
                                 <ul>
                                     {
-                                        room?.map(item=> !item.isDiscussion&& <li className={item.id===selectedRoom && !isTodo ? styles.isSelected:""} key={item.id} onClick={()=>{setSelectedRoom(item.id);setIsTodo(false)}}>＃<span>{item.name}</span></li>)
+                                        room?.map((item,index)=> !item.isDiscussion&& <li className={item.id===selectedRoom && !isTodo ? styles.isSelected:""} key={item.id} onClick={()=>{setSelectedRoom(item.id);setSelectedRoomIndex(index);setIsTodo(false)}}>＃<span>{item.name}</span></li>)
                                     }
                                     {
                                         showAddRoom&&<><div className={styles.changeUserNameBg}>
@@ -511,7 +504,7 @@ export default function Home() {
                                 <span className={styles.itemTitle} onClick={()=>{setShowDiscussionForm(true)}}><RiArrowDownSLine></RiArrowDownSLine><span>進行中のディスカッション</span><span>+</span></span>
                                 <ul>
                                     {
-                                        vote.map(item=>Date.now() < item.endTs&&<li className={item.roomId===selectedRoom && !isTodo ? styles.isSelected:""} key={item.roomId} onClick={()=>{setSelectedRoom(item.roomId);setIsTodo(false)}}><span className={styles.text}>{item.title}</span><span className={!item.voted?styles.tagActive:styles.tagPending}>{!item.voted?"未投票":"投票済"}</span></li>)
+                                        vote.map((item,index)=>Date.now() < item.endTs&&<li className={item.roomId===selectedRoom && !isTodo ? styles.isSelected:""} key={item.roomId} onClick={()=>{setSelectedRoom(item.roomId);setSelectedRoomIndex(Number(room?.findIndex((i) => i.id === item.roomId)));setIsTodo(false)}}><span className={styles.text}>{item.title}</span><span className={!item.voted?styles.tagActive:styles.tagPending}>{!item.voted?"未投票":"投票済"}</span></li>)
                                     }
                                 </ul>
                                 {
@@ -559,7 +552,7 @@ export default function Home() {
                                 <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>終了済みのディスカッション</span></span>
                                 <ul>
                                     {
-                                        vote.map(item=>Date.now() > item.endTs&&<li className={item.roomId===selectedRoom && !isTodo ? styles.isSelected:""} key={item.roomId} onClick={()=>{setSelectedRoom(item.roomId);setIsTodo(false)}}><span className={styles.text}>{item.title}</span><span>{!item.voted?"未投票":"投票済"}</span></li>)
+                                        vote.map((item,index)=>Date.now() > item.endTs&&<li className={item.roomId===selectedRoom && !isTodo ? styles.isSelected:""} key={item.roomId} onClick={()=>{setSelectedRoom(item.roomId);setSelectedRoomIndex(Number(room?.findIndex((i) => i.id === item.roomId)));setIsTodo(false)}}><span className={styles.text}>{item.title}</span><span>{!item.voted?"未投票":"投票済"}</span></li>)
                                     }
                                 </ul>
                             </div>
@@ -568,7 +561,7 @@ export default function Home() {
                             <div className={styles.chatBodyRight}>
                                 <div className={styles.chatBodyRightHeader}>
                                     <BsChat></BsChat>
-                                    <span>社内部活の予算の上限についての決定</span>
+                                    <span>{room!==undefined&&room[selectedRoomIndex].name}</span>
                                 </div>
                                 <div className={styles.chatBodyRightChatSpace}>
                                     <div className={styles.chatBody}>
