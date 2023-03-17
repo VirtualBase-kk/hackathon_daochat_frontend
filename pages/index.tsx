@@ -232,20 +232,28 @@ export default function Home() {
                 </div>
             </div>
             {
-                showCreateOrgModal&&<div className={styles.createOrgModal}>
+                showCreateOrgModal&&<div className={styles.createOrgModalBg}>
+                    <div className={styles.createOrgModalWrapper}>
+                    <div className={styles.closeButtonWrapper}　onClick={()=>{setShowCreateOrgModal(false)}}>
+                        <div className={styles.closeButton}>
+                        <AiOutlineClose onClick={()=>{setShowCreateOrgModal(false)}}></AiOutlineClose>
+                        </div>
+                    </div>
+                    <div className={styles.createOrgModal}>
                     <div className={styles.createOrgModalHeader}>
                         <span>組織を作成</span>
-                        <AiOutlineClose onClick={()=>{setShowCreateOrgModal(false)}}></AiOutlineClose>
+
                     </div>
                     <div className={styles.body}>
-                        <p>名前</p>
+                        <p className={styles.label}>名前</p>
                         <input placeholder={"組織の名前を入力してください"} onChange={(e)=>{setCreateOrgName(e.target.value)}}/>
-                        <button className={styles.button} onClick={()=>{createOrg()}}>作成</button>
-
-                        <br/>
-                        <span>*Metamask上で署名が必要です</span>
+                        <div className={styles.buttonWrapper}>
+                            <button className={styles.cancelButton} onClick={()=>{createOrg()}}>キャンセル</button>
+                            <button className={styles.nextButton} onClick={()=>{createOrg()}}>作成</button>
+                        </div>
                     </div>
                 </div>
+                    </div></div>
             }
 
         </div>
