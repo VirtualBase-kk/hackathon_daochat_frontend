@@ -27,6 +27,7 @@ import {useGetRoom} from "@/src/functions/chat/getRoomList";
 import {useCreateRoom} from "@/src/functions/chat/createRoom";
 import { v4 as uuidv4 } from 'uuid';
 import {useCreateDiscussion} from "@/src/functions/chat/addDiscussion";
+import {useGetVotes} from "@/src/functions/chat/getVote";
 export default function Home() {
     const auth = useContext(AuthContext)
     const loading = useContext(LoadingContext)
@@ -90,7 +91,7 @@ export default function Home() {
 
     const [roomTitle,setRoomTitle] = useState<string>("")
 
-    const [showDiscussionForm,setShowDiscussionForm] = useState<boolean>(true)
+    const [showDiscussionForm,setShowDiscussionForm] = useState<boolean>(false)
 
     const [choice,setChoice] = useState<string[]>(["",""])
 
@@ -263,6 +264,24 @@ export default function Home() {
             setRoom(currentRooms)
         }
     }
+
+    const [vote,setVote] = useState<{
+        title:string,
+        text:string,
+        choice: [
+            {
+                id: string
+                title: string
+            }
+        ],
+        result:{
+            [id:string]:number
+        },
+        voted:boolean,
+        endTs: number
+    }[]>([])
+
+    useGetVotes(auth,room,setVote)
 
     return (
     <>
