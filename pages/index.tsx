@@ -17,6 +17,9 @@ import {useCreateOrg} from "@/src/functions/admin/createOrganisation";
 import {toast} from "react-toastify";
 import {useGetUser} from "@/src/functions/user/getUser";
 import {useGetPoint} from "@/src/functions/user/getPoint";
+import {useChangeUserName} from "@/src/functions/user/changeUserName";
+import 'react-toastify/dist/ReactToastify.css';
+
 export default function Home() {
     const auth = useContext(AuthContext)
     const loading = useContext(LoadingContext)
@@ -44,6 +47,12 @@ export default function Home() {
 
     const [showUserModal,setShowUserModal] = useState<boolean>(false)
 
+    const [showChangeUserName,setShowChangeUserName] = useState<boolean>(false)
+
+    const [userNameTmp,setUserNameTmp] = useState<string>("")
+
+    const changeUserNameFunc = useChangeUserName()
+
     useEffect(()=>{
         if (!auth.isLogin) {
             router.push("/auth")
@@ -58,6 +67,13 @@ export default function Home() {
             setSelectedOrg(UserOrganisation[0].length !== 0?UserOrganisation[0]:"")
         }
     },[UserOrganisation])
+
+    useEffect(()=>{
+        if (user !== undefined) {
+            setUserNameTmp(user?.name?user.name:user?.walletAddress)
+        }
+    },[user])
+
 
     const createOrg = async () => {
         if (createOrgName.length !== 0) {
@@ -127,9 +143,37 @@ export default function Home() {
                         {
                             showUserModal&&(<><div className={styles.userModal}>
                                 <ul>
-                                    <li className={styles.borderB}>名前を変更</li>
-                                    <li>サインアウト</li>
+                                    <li className={styles.borderB} onClick={()=>{setShowChangeUserName(true)}}>名前を変更</li>
+                                    <li onClick={()=>{auth.signOut()}}>サインアウト</li>
                                 </ul></div></>)
+                        }
+                        {
+                            showChangeUserName&&(
+                                <>
+                                    <div className={styles.changeUserNameBg}>
+                                        <div className={styles.changeUserNameWrapper}>
+                                            <div className={styles.closeButtonWrapper}　onClick={()=>{setShowChangeUserName(false)}}>
+                                                <div className={styles.closeButton}>
+                                                    <AiOutlineClose onClick={()=>{setShowChangeUserName(false)}}></AiOutlineClose>
+                                                </div>
+                                            </div>
+                                            <div className={styles.changeUserNameModal}>
+                                                <div className={styles.changeUserNameHeader}>
+                                                    <span>ユーザー名を変更</span>
+
+                                                </div>
+                                                <div className={styles.body}>
+                                                    <p className={styles.label}>ユーザー名</p>
+                                                    <input placeholder={"ユーザー名を入力してください"} value={userNameTmp}  onChange={(e)=>{setUserNameTmp(e.target.value)}}/>
+                                                    <div className={styles.buttonWrapper}>
+                                                        <button className={styles.cancelButton} onClick={()=>{setShowChangeUserName(false)}}>キャンセル</button>
+                                                        <button className={styles.nextButton} onClick={()=>{userNameTmp.length !== 0?(async ()=>{const resp = await changeUserNameFunc(auth,userNameTmp,setUser,user);resp&&setShowChangeUserName(false)})():toast.error("入力してください")}}>変更</button>
+                                                    </div>
+                                                </div>
+                                            </div>
+                                        </div></div>
+                                </>
+                            )
                         }
                     </div>
                 </div>
@@ -276,7 +320,7 @@ export default function Home() {
                         <p className={styles.label}>名前</p>
                         <input placeholder={"組織の名前を入力してください"} onChange={(e)=>{setCreateOrgName(e.target.value)}}/>
                         <div className={styles.buttonWrapper}>
-                            <button className={styles.cancelButton} onClick={()=>{createOrg()}}>キャンセル</button>
+                            <button className={styles.cancelButton} onClick={()=>{setShowCreateOrgModal(false)}}>キャンセル</button>
                             <button className={styles.nextButton} onClick={()=>{createOrg()}}>作成</button>
                         </div>
                     </div>
