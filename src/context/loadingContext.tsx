@@ -15,7 +15,7 @@ const getStyle = (type: boolean, isLoading: boolean) => {
         top:"0",
         left:"0",
         bottom:"0",
-        zIndex:"10",
+        zIndex:"1000",
         backgroundColor:"rgba(255,255,255,0.5)"
     }
     if (type && isLoading) {
