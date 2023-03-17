@@ -42,6 +42,8 @@ export default function Home() {
 
     const createOrgFunc = useCreateOrg()
 
+    const [showUserModal,setShowUserModal] = useState<boolean>(false)
+
     useEffect(()=>{
         if (!auth.isLogin) {
             router.push("/auth")
@@ -115,13 +117,20 @@ export default function Home() {
                                 <AiOutlineSetting />
                             </div>
                         </div>
-                        <div className={styles.chatHeaderRightRight}>
+                        <div className={styles.chatHeaderRightRight} onClick={()=>{setShowUserModal(!showUserModal)}}>
                             <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg(user?.walletAddress, 50) }} /></div>
                             <div className={styles.metadata}>
                                 <p>{user?.name?user.name:user?.walletAddress.slice(0,10)+"..."}</p>
                                 <span>スコア：<span className={styles.score}>{point}pt</span></span>
                             </div>
                         </div>
+                        {
+                            showUserModal&&(<><div className={styles.userModal}>
+                                <ul>
+                                    <li className={styles.borderB}>名前を変更</li>
+                                    <li>サインアウト</li>
+                                </ul></div></>)
+                        }
                     </div>
                 </div>
                 <div className={styles.chatBody}>
