@@ -9,7 +9,7 @@ export function useGetOrganisation(auth:any,setOrganisation:any) {
                    Authorization:token.token
                }
            })
-            console.log(resp)
+            setOrganisation(resp.data)
         })()
     }, [])
 }

@@ -20,9 +20,9 @@ export default function Home() {
     const loading = useContext(LoadingContext)
     const router = useRouter()
 
-    //const [UserOrganisation,setUserOrganisation] = useState<string>("")
+    const [UserOrganisation,setUserOrganisation] = useState<string[]>([])
 
-    //useGetOrganisation(auth,setUserOrganisation)
+    useGetOrganisation(auth,setUserOrganisation)
 
     const [createOrgName,setCreateOrgName] = useState<string>("")
 
@@ -57,7 +57,7 @@ export default function Home() {
                 toast.error("失敗しました")
             }
             loading.setLoading(false)
-            globalThis.window.reload()
+            globalThis.window.location.reload()
         }
 
     }
