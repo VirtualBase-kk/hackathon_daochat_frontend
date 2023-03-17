@@ -459,7 +459,7 @@
                   color: #00671D
                   box-sizing: border-box
                   padding: 5px
-                  background: rgba(0,103,29,0.12)
+                  background: #00671D1E
               .isSelected
                 color: white
                 background-color: #03260D
@@ -484,6 +484,38 @@
           .chatBodyRightChatSpace
             width: 100%
             height: calc(100% - 73px)
+            .todoBody
+              display: flex
+              box-sizing: border-box
+              width: 100%
+              justify-content: space-between
+              padding: 20px
+              div
+                min-width: 300px
+              button
+                height: 40px
+                width: 150px
+                border: 1px solid #00671D
+                color: #00671D
+                background-color: white
+                border-radius: 5px
+              span
+                font-size: 12px
+                color: rgba(0,0,0,0.5)
+              p
+                margin: 5px 0
+                font-size: 16px
+              .description
+                font-size: 14px
+              .point
+                color: #00671D
+              .flex
+                display: flex
+                margin-top: 20px
+                width: 30%
+                justify-content: space-between
+                p
+                  font-size: 18px
             .chatBody
               height: calc(100% - 80px)
               width: 90%

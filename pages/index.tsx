@@ -28,6 +28,7 @@ import {useCreateRoom} from "@/src/functions/chat/createRoom";
 import { v4 as uuidv4 } from 'uuid';
 import {useCreateDiscussion} from "@/src/functions/chat/addDiscussion";
 import {useGetVotes} from "@/src/functions/chat/getVote";
+import {useChangeTodo} from "@/src/functions/chat/changeTodo";
 export default function Home() {
     const auth = useContext(AuthContext)
     const loading = useContext(LoadingContext)
@@ -71,7 +72,7 @@ export default function Home() {
 
     useGetOrg(auth,selectedOrg,setOrg)
 
-    const [todo,setTodo] = useState<{id: string, title: string, status: number,description:string,point:number}[]>()
+    const [todo,setTodo] = useState<{id: string, title: string, status: number,description:string,point:number,userId:string}[]>()
 
     const [showAddTodo,setShowAddTodo] = useState<boolean>(false)
 
@@ -193,7 +194,8 @@ export default function Home() {
                 title:todoTitle,
                 status: 0,
                 description:todoDescription,
-                point: todoPoint
+                point: todoPoint,
+                userId: ""
             })
             setTodo(todoList)
             setShowAddTodo(false)
@@ -293,6 +295,10 @@ export default function Home() {
         console.log(vote)
     },[vote])
 
+    const [selectedTodoIndex,setSelectedTodoIndex] = useState<number>(0)
+    const [isTodo,setIsTodo] = useState<boolean>(false)
+
+    const changeTodoFunc = useChangeTodo()
 
     return (
     <>
@@ -405,8 +411,8 @@ export default function Home() {
                                 <span className={styles.itemTitle} onClick={()=>{setShowAddTodo(true)}}><RiArrowDownSLine></RiArrowDownSLine><span>タスク</span><span>+</span></span>
                                 <ul>
                                     {
-                                        todo?.map(item=>{
-                                            return <li key={item.id}><BsFileEarmark></BsFileEarmark><span>{item.title}</span></li>
+                                        todo?.map((item,index)=>{
+                                            return <li key={item.id} className={index === selectedTodoIndex?styles.isSelected:""} onClick={()=>{setSelectedTodoIndex(index);setIsTodo(true)}}><BsFileEarmark></BsFileEarmark><span>{item.title}</span></li>
                                         })
 
                                     }
@@ -444,7 +450,7 @@ export default function Home() {
                                 <span className={styles.itemTitle} onClick={()=>{setShowAddRoom(true)}}><RiArrowDownSLine></RiArrowDownSLine><span>チャットチャンネル</span><span>+</span></span>
                                 <ul>
                                     {
-                                        room?.map(item=> !item.isDiscussion&& <li className={item.id===selectedRoom ? styles.isSelected:""} key={item.id}>＃<span>{item.name}</span></li>)
+                                        room?.map(item=> !item.isDiscussion&& <li className={item.id===selectedRoom && !isTodo ? styles.isSelected:""} key={item.id} onClick={()=>{setSelectedRoom(item.id);setIsTodo(false)}}>＃<span>{item.name}</span></li>)
                                     }
                                     {
                                         showAddRoom&&<><div className={styles.changeUserNameBg}>
@@ -475,7 +481,7 @@ export default function Home() {
                                 <span className={styles.itemTitle} onClick={()=>{setShowDiscussionForm(true)}}><RiArrowDownSLine></RiArrowDownSLine><span>進行中のディスカッション</span><span>+</span></span>
                                 <ul>
                                     {
-                                        vote.map(item=>Date.now() < item.endTs&&<li className={item.roomId===selectedRoom ? styles.isSelected:""} key={item.roomId}><span className={styles.text}>{item.title}</span><span className={!item.voted?styles.tagActive:styles.tagPending}>{!item.voted?"未投票":"投票済"}</span></li>)
+                                        vote.map(item=>Date.now() < item.endTs&&<li className={item.roomId===selectedRoom && !isTodo ? styles.isSelected:""} key={item.roomId} onClick={()=>{setSelectedRoom(item.roomId);setIsTodo(false)}}><span className={styles.text}>{item.title}</span><span className={!item.voted?styles.tagActive:styles.tagPending}>{!item.voted?"未投票":"投票済"}</span></li>)
                                     }
                                 </ul>
                                 {
@@ -523,99 +529,130 @@ export default function Home() {
                                 <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>終了済みのディスカッション</span></span>
                                 <ul>
                                     {
-                                        vote.map(item=>Date.now() > item.endTs&&<li className={item.roomId===selectedRoom ? styles.isSelected:""} key={item.roomId}><span className={styles.text}>{item.title}</span><span className={styles.tagPending}>{!item.voted?"未投票":"投票済"}</span></li>)
+                                        vote.map(item=>Date.now() > item.endTs&&<li className={item.roomId===selectedRoom && !isTodo ? styles.isSelected:""} key={item.roomId} onClick={()=>{setSelectedRoom(item.roomId);setIsTodo(false)}}><span className={styles.text}>{item.title}</span><span>{!item.voted?"未投票":"投票済"}</span></li>)
                                     }
                                 </ul>
                             </div>
                         </div>
-                        <div className={styles.chatBodyRight}>
-                            <div className={styles.chatBodyRightHeader}>
-                                <BsChat></BsChat>
-                                <span>社内部活の予算の上限についての決定</span>
-                            </div>
-                            <div className={styles.chatBodyRightChatSpace}>
-                                <div className={styles.chatBody}>
-                                    <div className={styles.chatItem}>
-                                        <div className={styles.chatItemHeader}>
-                                            <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                            <p>issui ikeda</p>
-                                            <span>12:42 PM</span>
-                                        </div>
-                                        <div className={styles.chatItemBody}>
-                                            <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
-                                        </div>
-                                    </div>
-                                    <div className={styles.chatItem}>
-                                        <div className={styles.chatItemHeader}>
-                                            <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                            <p>issui ikeda</p>
-                                            <span>12:42 PM</span>
-                                        </div>
-                                        <div className={styles.chatItemBody}>
-                                            <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
-                                        </div>
-                                    </div>
-                                    <div className={styles.chatItem}>
-                                        <div className={styles.chatItemHeader}>
-                                            <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                            <p>issui ikeda</p>
-                                            <span>12:42 PM</span>
-                                        </div>
-                                        <div className={styles.chatItemBody}>
-                                            <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
-                                        </div>
-                                    </div>
-                                    <div className={styles.chatItem}>
-                                        <div className={styles.chatItemHeader}>
-                                            <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                            <p>issui ikeda</p>
-                                            <span>12:42 PM</span>
-                                        </div>
-                                        <div className={styles.chatItemBody}>
-                                            <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
-                                        </div>
-                                    </div>
-                                    <div className={styles.chatItem}>
-                                        <div className={styles.chatItemHeader}>
-                                            <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                            <p>issui ikeda</p>
-                                            <span>12:42 PM</span>
-                                        </div>
-                                        <div className={styles.chatItemBody}>
-                                            <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。あああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
-                                        </div>
-                                    </div>
-                                    <div className={styles.chatItem}>
-                                        <div className={styles.chatItemHeader}>
-                                            <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                            <p>issui ikeda</p>
-                                            <span>12:42 PM</span>
-                                        </div>
-                                        <div className={styles.chatItemBody}>
-                                            <p>メアド認証ができるパターンメアド入力 → Cognito認証 → ログイン<br/>
-                                                メアド入力 → Cognito認証 → カスタム認証 → ログイン<br/>
-                                                メタマスク認証ができるパターンメタマスクログイン → カスタム認証 → ログイン<br/></p>
-                                        </div>
-                                    </div>
+                        {!isTodo?(
+                            <div className={styles.chatBodyRight}>
+                                <div className={styles.chatBodyRightHeader}>
+                                    <BsChat></BsChat>
+                                    <span>社内部活の予算の上限についての決定</span>
                                 </div>
-                                <div className={styles.chatInput}>
-                                    <input className={styles.chatInputInput} placeholder={"ここにテキストを入力"}/>
-                                    <button><BsSend></BsSend></button>
-                                </div>
-                                <div className={styles.vote}>
-                                    <div className={styles.voteHeader}>
-                                        <h1>進行中の投票</h1>
-                                        <span>詳細を表示</span>
+                                <div className={styles.chatBodyRightChatSpace}>
+                                    <div className={styles.chatBody}>
+                                        <div className={styles.chatItem}>
+                                            <div className={styles.chatItemHeader}>
+                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                                <p>issui ikeda</p>
+                                                <span>12:42 PM</span>
+                                            </div>
+                                            <div className={styles.chatItemBody}>
+                                                <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
+                                            </div>
+                                        </div>
+                                        <div className={styles.chatItem}>
+                                            <div className={styles.chatItemHeader}>
+                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                                <p>issui ikeda</p>
+                                                <span>12:42 PM</span>
+                                            </div>
+                                            <div className={styles.chatItemBody}>
+                                                <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
+                                            </div>
+                                        </div>
+                                        <div className={styles.chatItem}>
+                                            <div className={styles.chatItemHeader}>
+                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                                <p>issui ikeda</p>
+                                                <span>12:42 PM</span>
+                                            </div>
+                                            <div className={styles.chatItemBody}>
+                                                <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
+                                            </div>
+                                        </div>
+                                        <div className={styles.chatItem}>
+                                            <div className={styles.chatItemHeader}>
+                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                                <p>issui ikeda</p>
+                                                <span>12:42 PM</span>
+                                            </div>
+                                            <div className={styles.chatItemBody}>
+                                                <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
+                                            </div>
+                                        </div>
+                                        <div className={styles.chatItem}>
+                                            <div className={styles.chatItemHeader}>
+                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                                <p>issui ikeda</p>
+                                                <span>12:42 PM</span>
+                                            </div>
+                                            <div className={styles.chatItemBody}>
+                                                <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。あああああああああああああああああああああああああああああああああああああああああああああああああああああああ</p>
+                                            </div>
+                                        </div>
+                                        <div className={styles.chatItem}>
+                                            <div className={styles.chatItemHeader}>
+                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
+                                                <p>issui ikeda</p>
+                                                <span>12:42 PM</span>
+                                            </div>
+                                            <div className={styles.chatItemBody}>
+                                                <p>メアド認証ができるパターンメアド入力 → Cognito認証 → ログイン<br/>
+                                                    メアド入力 → Cognito認証 → カスタム認証 → ログイン<br/>
+                                                    メタマスク認証ができるパターンメタマスクログイン → カスタム認証 → ログイン<br/></p>
+                                            </div>
+                                        </div>
                                     </div>
-                                    <div className={styles.voteItem}>
-                                        <div className={styles.voteChoice}><span>1.ほげほげほげほげ<div>+</div></span></div>
-                                        <div className={styles.voteChoice}><span>2.ああああああああ<div>+</div></span></div>
-                                        <div className={styles.voteChoice}><span>3.いいいいいいいい<div>+</div></span></div>
+                                    <div className={styles.chatInput}>
+                                        <input className={styles.chatInputInput} placeholder={"ここにテキストを入力"}/>
+                                        <button><BsSend></BsSend></button>
                                     </div>
-                                </div>
+                                    <div className={styles.vote}>
+                                        <div className={styles.voteHeader}>
+                                            <h1>進行中の投票</h1>
+                                            <span>詳細を表示</span>
+                                        </div>
+                                        <div className={styles.voteItem}>
+                                            <div className={styles.voteChoice}><span>1.ほげほげほげほげ<div>+</div></span></div>
+                                            <div className={styles.voteChoice}><span>2.ああああああああ<div>+</div></span></div>
+                                            <div className={styles.voteChoice}><span>3.いいいいいいいい<div>+</div></span></div>
+                                        </div>
+                                    </div>
 
+                                </div>
                             </div>
-                        </div>
+                        ):(
+                            <div className={styles.chatBodyRight}>
+                                <div className={styles.chatBodyRightHeader}>
+                                    <BsFileEarmark></BsFileEarmark>
+                                    <span>{todo!==undefined&&todo[selectedTodoIndex].title}</span>
+                                </div>
+                                <div className={styles.chatBodyRightChatSpace}>
+                                    <div className={styles.todoBody}>
+                                        <div>
+                                            <span>タイトル</span>
+                                            <p>{todo!==undefined&&todo[selectedTodoIndex].title}</p>
+                                            <span>説明</span>
+                                            <p className={styles.description}>{todo!==undefined&&todo[selectedTodoIndex].description}</p>
+                                            <div className={styles.flex}>
+                                                <div>
+                                                    <span>付与スコア</span>
+                                                    <p className={styles.point}>{todo!==undefined&&todo[selectedTodoIndex].point}pt</p>
+                                                </div>
+                                                <div>
+                                                    <span>作業者</span>
+                                                    <p>{todo!==undefined&&todo[selectedTodoIndex].userId||"-"}</p>
+                                                </div>
+                                            </div>
+                                        </div>
+                                        {todo!==undefined&&!todo[selectedTodoIndex].status&&<button className={styles.doneButton} onClick={()=>{changeTodoFunc(auth,todo[selectedTodoIndex].id)}}>完了報告</button>}
+                                    </div>
+                                </div>
+                            </div>
+                        )}
+
 
                     </div>)
                 }

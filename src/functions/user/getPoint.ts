@@ -6,7 +6,7 @@ export function useGetPoint(auth:any,setPoint:any,selected:string) {
             (async ()=>{
                 const userData = await auth.userInfo()
                 const token = await auth.getToken()
-                const resp = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT+"user/point?id="+userData.info.username,{
+                const resp = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT+"user/point?id="+selected,{
                     headers:{
                         Authorization:token.token
                     }
