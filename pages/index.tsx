@@ -21,6 +21,8 @@ import {useChangeUserName} from "@/src/functions/user/changeUserName";
 import 'react-toastify/dist/ReactToastify.css';
 import {useGetOrg} from "@/src/functions/chat/getOrgName";
 import {useAddMember} from "@/src/functions/admin/addMember";
+import {useGetTodo} from "@/src/functions/chat/getTodo";
+import {useAddTodo} from "@/src/functions/chat/addTodo";
 
 export default function Home() {
     const auth = useContext(AuthContext)
@@ -64,6 +66,18 @@ export default function Home() {
     const addMemberFunc = useAddMember()
 
     useGetOrg(auth,selectedOrg,setOrg)
+
+    const [todo,setTodo] = useState<{id: string, title: string, status: number,description:string,point:number}[]>()
+
+    const [showAddTodo,setShowAddTodo] = useState<boolean>(false)
+
+    const [todoTitle,setTodoTitle] = useState<string>("")
+    const [todoDescription,setTodoDescription] = useState<string>("")
+    const [todoPoint,setTodoPoint] = useState<number>(0)
+
+    const addTodoFunc = useAddTodo()
+
+    useGetTodo(auth,selectedOrg,setTodo)
 
     useEffect(()=>{
         if (!auth.isLogin) {
@@ -136,6 +150,23 @@ export default function Home() {
                 toast.error("失敗しました")
             }
 
+        }
+    }
+
+    const addTodo = async () => {
+        if (todoTitle.length !== 0&& todoDescription.length !==0) {
+            const resp = await addTodoFunc(auth,selectedOrg,todoTitle,todoDescription,todoPoint)
+            toast("追加しました")
+            const todoList = todo
+            todoList?.push({
+                id: resp.id,
+                title:todoTitle,
+                status: 0,
+                description:todoDescription,
+                point: todoPoint
+            })
+            setTodo(todoList)
+            setShowAddTodo(false)
         }
     }
 
@@ -247,15 +278,46 @@ export default function Home() {
                     selectedOrg.length !== 0 && (<div className={styles.chatBody}>
                         <div className={styles.chatBodyLeft}>
                             <div className={styles.chatBodyLeftItem}>
-                                <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>タスク</span></span>
+                                <span className={styles.itemTitle} onClick={()=>{setShowAddTodo(true)}}><RiArrowDownSLine></RiArrowDownSLine><span>タスク</span><span>+</span></span>
                                 <ul>
-                                    <li className={styles.isSelected}><BsFileEarmark></BsFileEarmark><span>トイレの掃除</span></li>
-                                    <li><BsFileEarmark></BsFileEarmark><span>コーヒーメーカーの設置をああああああ</span></li>
-                                    <li><BsFileEarmark></BsFileEarmark><span>今度の飲み会の幹事をあああああああああ</span></li>
+                                    {
+                                        todo?.map(item=>{
+                                            return <li key={item.id}><BsFileEarmark></BsFileEarmark><span>{item.title}</span></li>
+                                        })
+
+                                    }
+                                    {
+                                        showAddTodo&&<><div className={styles.changeUserNameBg}>
+                                            <div className={styles.changeUserNameWrapper}>
+                                                <div className={styles.closeButtonWrapper}　onClick={()=>{setShowAddTodo(false)}}>
+                                                    <div className={styles.closeButton}>
+                                                        <AiOutlineClose onClick={()=>{setShowAddTodo(false)}}></AiOutlineClose>
+                                                    </div>
+                                                </div>
+                                                <div className={styles.changeUserNameModal}>
+                                                    <div className={styles.changeUserNameHeader}>
+                                                        <span>タスク追加</span>
+
+                                                    </div>
+                                                    <div className={styles.body}>
+                                                        <p className={styles.label}>タスク</p>
+                                                        <input placeholder={"タスクタイトルを入力してください"}  onChange={(e)=>{setTodoTitle(e.target.value)}}/>
+                                                        <p className={styles.label}>詳細</p>
+                                                        <textarea onChange={(e)=>{setTodoDescription(e.target.value)}}></textarea>
+                                                        <p className={styles.label}>ポイント</p>
+                                                        <input placeholder={"ポイント数を入力してください"}  onChange={(e)=>{setTodoPoint(Number(e.target.value))}}/>
+                                                        <div className={styles.buttonWrapper}>
+                                                            <button className={styles.cancelButton} onClick={()=>{setShowAddTodo(false)}}>キャンセル</button>
+                                                            <button className={styles.nextButton} onClick={()=>{addTodo()}}>追加</button>
+                                                        </div>
+                                                    </div>
+                                                </div>
+                                            </div></div></>
+                                    }
                                 </ul>
                             </div>
                             <div className={styles.chatBodyLeftItem}>
-                                <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>チャットチャンネル</span></span>
+                                <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>チャットチャンネル</span><span>+</span></span>
                                 <ul>
                                     <li className={styles.isSelected}>＃<span>トイレの掃除</span></li>
                                     <li>＃<span>コーヒーメーカーの設置をああああああ</span></li>
@@ -263,7 +325,7 @@ export default function Home() {
                                 </ul>
                             </div>
                             <div className={styles.chatBodyLeftItemDiscussion}>
-                                <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>進行中のディスカッション</span></span>
+                                <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>進行中のディスカッション</span><span>+</span></span>
                                 <ul>
                                     <li className={styles.isSelected}><span className={styles.text}>トイレの掃除</span><span className={styles.tagActive}>未投票</span></li>
                                     <li><span className={styles.text}>コーヒーメーカーの設置をああああああ</span><span className={styles.tagPending}>未投票</span></li>
@@ -271,7 +333,7 @@ export default function Home() {
                                 </ul>
                             </div>
                             <div className={styles.chatBodyLeftItemDiscussion}>
-                                <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>進行中のディスカッション</span></span>
+                                <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>終了済みのディスカッション</span><span>+</span></span>
                                 <ul>
                                     <li className={styles.isSelected}><span className={styles.text}>トイレの掃除</span><span className={styles.tagActive}>未投票</span></li>
                                     <li><span className={styles.text}>コーヒーメーカーの設置をああああああ</span><span className={styles.tagPending}>未投票</span></li>

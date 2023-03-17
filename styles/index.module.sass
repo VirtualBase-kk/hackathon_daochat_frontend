@@ -248,6 +248,132 @@
         height: calc(100% - 80px)
         display: flex
         box-sizing: border-box
+        .changeUserNameBg
+          position: absolute
+          top: 0
+          left: 0
+          width: 100vw
+          height: 100vh
+          background-color: rgba(0,0,0,0.3)
+          z-index: 100
+          .changeUserNameWrapper
+            position: absolute
+            transform: translate(-50%, -50%)
+            -webkit-transform: translate(-50%, -50%)
+            -ms-transform: translate(-50%, -50%)
+            top: 50%
+            left: 50%
+            width: 50%
+            .closeButtonWrapper
+              width: 100%
+              height: 36px
+              position: relative
+              display: flex
+              justify-content: end
+              padding-right: 20px
+              box-sizing: border-box
+              top: 0
+              left: 0
+              .closeButton
+                width: 60px
+                height: 36px
+                display: flex
+                align-items: center
+                justify-content: center
+                padding-top: 5px
+                box-sizing: border-box
+                border-radius: 30px 30px 0px 0px
+                background-color: white
+                font-size: 16px
+            .changeUserNameHeader
+              width: 100%
+              height: 36px
+              position: relative
+              display: flex
+              justify-content: end
+              padding-right: 20px
+              box-sizing: border-box
+              top: 0
+              left: 0
+              .closeButton
+                width: 60px
+                height: 36px
+                display: flex
+                align-items: center
+                justify-content: center
+                padding-top: 5px
+                box-sizing: border-box
+                border-radius: 30px 30px 0px 0px
+                background-color: white
+                font-size: 16px
+            .changeUserNameModal
+              width: 100%
+              height: 440px
+              background-color: white
+              border-radius: 10px
+              box-sizing: border-box
+              .changeUserNameHeader
+                width: 100%
+                box-sizing: border-box
+                height: 60px
+                padding: 0 32px
+                display: flex
+                justify-content: space-between
+                align-items: center
+                border-bottom: 1px solid rgba(0,0,0,0.12)
+                span
+                  font-weight: 500
+              .body
+                width: 100%
+                text-align: right
+                padding: 20px 32px
+                box-sizing: border-box
+                p
+
+                  font-weight: 400
+                  text-align: left
+                  margin: 0
+                  font-size: 14px
+                  margin-bottom: 10px
+                  margin-top: 10px
+                input
+                  box-sizing: border-box
+                  height: 48px
+                  padding: 10px
+                  border-radius: 5px
+                  border: 1px solid rgba(0,0,0,0.2)
+                  width: 100%
+                textarea
+                  box-sizing: border-box
+                  height: 48px
+                  padding: 10px
+                  border-radius: 5px
+                  border: 1px solid rgba(0,0,0,0.2)
+                  width: 100%
+                .buttonWrapper
+                  width: 100%
+                  display: flex
+                  align-items: center
+                  justify-content: space-between
+                  .cancelButton
+                    border: none
+                    background: white
+                    margin-top: 20px
+                    height: 40px
+                    width: 100px
+                    color: #00671D
+                    margin-bottom: 10px
+                    font-size: 14px
+                  .nextButton
+                    border: 1px solid rgba(0,0,0,0.2)
+                    background: black
+                    border-radius: 5px
+                    margin-top: 20px
+                    height: 40px
+                    width: 150px
+                    color: white
+                    margin-bottom: 10px
+                    font-size: 14px
         .chatBodyLeft
           width: 240px
           height: 100%
