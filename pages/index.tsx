@@ -15,7 +15,7 @@ import {useGetOrganisation} from "@/src/functions/user/getOrganisation";
 import {LoadingContext} from "@/src/context/loadingContext";
 import {useCreateOrg} from "@/src/functions/admin/createOrganisation";
 import {toast} from "react-toastify";
-import {useGetUser} from "@/src/functions/user/getUser";
+import {GetUserById, useGetUser} from "@/src/functions/user/getUser";
 import {useGetPoint} from "@/src/functions/user/getPoint";
 import {useChangeUserName} from "@/src/functions/user/changeUserName";
 import 'react-toastify/dist/ReactToastify.css';
@@ -298,7 +298,37 @@ export default function Home() {
     const [selectedTodoIndex,setSelectedTodoIndex] = useState<number>(0)
     const [isTodo,setIsTodo] = useState<boolean>(false)
 
+    const [todoUser,setTodoUser] = useState<{name:string,walletAddress:string}>({name:"-",walletAddress:""})
+
     const changeTodoFunc = useChangeTodo()
+
+    useEffect(()=>{
+        if(isTodo && todo !== undefined && todo[selectedTodoIndex].userId !== undefined) {
+            (async()=>{
+                const resp = await GetUserById(auth,todo[selectedTodoIndex].userId)
+                setTodoUser({
+                    name:resp.name,
+                    walletAddress:resp.walletAddress
+                })
+            })()
+        } else {
+            setTodoUser(
+                {
+                    name: "-",
+                    walletAddress: ""
+                }
+            )
+        }
+    },[selectedTodoIndex])
+
+    const getUser = async (userId:string) => {
+        if (userId.length !== 0) {
+            const resp = await GetUserById(auth,userId)
+            return {name:resp.name,icon:resp.walletAddress}
+        } else {
+            return {name:"-",icon:""}
+        }
+    }
 
     return (
     <>
@@ -643,8 +673,9 @@ export default function Home() {
                                                 </div>
                                                 <div>
                                                     <span>作業者</span>
-                                                    <p>{todo!==undefined&&todo[selectedTodoIndex].userId||"-"}</p>
+                                                    <p>{todoUser.name}</p>
                                                 </div>
+
                                             </div>
                                         </div>
                                         {todo!==undefined&&!todo[selectedTodoIndex].status&&<button className={styles.doneButton} onClick={()=>{changeTodoFunc(auth,todo[selectedTodoIndex].id)}}>完了報告</button>}
