@@ -1,6 +1,6 @@
 import {useEffect} from "react";
 import axios from "axios"
-export function useGetVotes(auth:any,room?:{id:string,name:string,isDiscussion:boolean}[],setVote:any) {
+export function useGetVotes(auth:any,setVote:any,room?:{id:string,name:string,isDiscussion:boolean}[]) {
     useEffect(()=>{
         if (room !== undefined) {
             (async ()=>{
@@ -19,15 +19,33 @@ export function useGetVotes(auth:any,room?:{id:string,name:string,isDiscussion:b
                     },
                     voted:boolean,
                     endTs: number
+                    roomId: string
                 }[] = []
-                await Promise.any(room?.map(async (item,index)=>{
+                await Promise.all(room?.map(async (item,index)=>{
                     if (item.isDiscussion) {
                         const resp = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT+"room/vote/?id="+item.id,{
                             headers:{
                                 Authorization:token.token
                             }
                         })
-                        respVote.push(resp.data)
+                        const votePutItem:{
+                            title:string,
+                            text:string,
+                            choice: [
+                                {
+                                    id: string
+                                    title: string
+                                }
+                            ],
+                            result:{
+                                [id:string]:number
+                            },
+                            voted:boolean,
+                            endTs: number
+                            roomId: string
+                        } = resp.data
+                        votePutItem.roomId = item.id
+                        respVote.push(votePutItem)
                     }
                 }))
                 setVote(respVote)

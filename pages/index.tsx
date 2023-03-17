@@ -254,6 +254,11 @@ export default function Home() {
             const accounts = await globalThis.window?.ethereum.request({ method: 'eth_requestAccounts' });
             //@ts-ignore
             const web3 = new Web3(globalThis.window?.ethereum)
+            console.log({
+                from: accounts[0],
+                data: resp.message,
+                to: org?.contractAddress
+            })
             const r = await web3.eth.sendTransaction({
                 from: accounts[0],
                 data: resp.message,
@@ -278,10 +283,16 @@ export default function Home() {
             [id:string]:number
         },
         voted:boolean,
-        endTs: number
+        endTs: number,
+        roomId: string
     }[]>([])
 
-    useGetVotes(auth,room,setVote)
+    useGetVotes(auth,setVote,room)
+
+    useEffect(()=>{
+        console.log(vote)
+    },[vote])
+
 
     return (
     <>
@@ -463,9 +474,9 @@ export default function Home() {
                             <div className={styles.chatBodyLeftItemDiscussion}>
                                 <span className={styles.itemTitle} onClick={()=>{setShowDiscussionForm(true)}}><RiArrowDownSLine></RiArrowDownSLine><span>進行中のディスカッション</span><span>+</span></span>
                                 <ul>
-                                    <li className={styles.isSelected}><span className={styles.text}>トイレの掃除</span><span className={styles.tagActive}>未投票</span></li>
-                                    <li><span className={styles.text}>コーヒーメーカーの設置をああああああ</span><span className={styles.tagPending}>未投票</span></li>
-                                    <li><span className={styles.text}>今度の飲み会の幹事をあああああああああ</span><span className={styles.tagPending}>検討中</span></li>
+                                    {
+                                        vote.map(item=>Date.now() < item.endTs&&<li className={item.roomId===selectedRoom ? styles.isSelected:""} key={item.roomId}><span className={styles.text}>{item.title}</span><span className={!item.voted?styles.tagActive:styles.tagPending}>{!item.voted?"未投票":"投票済"}</span></li>)
+                                    }
                                 </ul>
                                 {
                                     showDiscussionForm&&<><div className={styles.changeUserNameBg}>
@@ -511,9 +522,9 @@ export default function Home() {
                             <div className={styles.chatBodyLeftItemDiscussion}>
                                 <span className={styles.itemTitle}><RiArrowDownSLine></RiArrowDownSLine><span>終了済みのディスカッション</span></span>
                                 <ul>
-                                    <li className={styles.isSelected}><span className={styles.text}>トイレの掃除</span><span className={styles.tagActive}>未投票</span></li>
-                                    <li><span className={styles.text}>コーヒーメーカーの設置をああああああ</span><span className={styles.tagPending}>未投票</span></li>
-                                    <li><span className={styles.text}>今度の飲み会の幹事をあああああああああ</span><span className={styles.tagPending}>検討中</span></li>
+                                    {
+                                        vote.map(item=>Date.now() > item.endTs&&<li className={item.roomId===selectedRoom ? styles.isSelected:""} key={item.roomId}><span className={styles.text}>{item.title}</span><span className={styles.tagPending}>{!item.voted?"未投票":"投票済"}</span></li>)
+                                    }
                                 </ul>
                             </div>
                         </div>
