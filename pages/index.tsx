@@ -31,6 +31,7 @@ import {useGetVotes} from "@/src/functions/chat/getVote";
 import {useChangeTodo} from "@/src/functions/chat/changeTodo";
 import {GetChat} from "@/src/functions/chat/getChat";
 import {PostChat} from "@/src/functions/chat/postChat";
+import {PostVote} from "@/src/functions/chat/postVote";
 export default function Home() {
     const auth = useContext(AuthContext)
     const loading = useContext(LoadingContext)
@@ -275,6 +276,7 @@ export default function Home() {
     }
 
     const [vote,setVote] = useState<{
+        id: string,
         title:string,
         text:string,
         choice: [
@@ -288,7 +290,8 @@ export default function Home() {
         },
         voted:boolean,
         endTs: number,
-        roomId: string
+        roomId: string,
+        votedId: string
     }[]>([])
 
     useGetVotes(auth,setVote,room)
@@ -357,38 +360,52 @@ export default function Home() {
 
     const [showVoteModal,setShowVoteModal] = useState<boolean>(false)
 
-    // useEffect(()=>{
-    //     clearInterval(iId);
-    //     if (!isTodo && selectedRoom.length !== 0) {
-    //         (async()=>{
-    //             const resp:{
-    //                 text:string,
-    //                 createdTs: number,
-    //                 userId: string,
-    //                 userName: string,
-    //                 walletAddress: string,
-    //             }[] = await GetChat(auth,selectedRoom)
-    //             resp.sort((a,b)=>a.createdTs-b.createdTs)
-    //             setChat(resp)
-    //         })()
-    //         const intervalId = setInterval(async() => {
-    //             if (isTodo) {
-    //                 clearInterval(intervalId)
-    //             }
-    //             const resp:{
-    //                 text:string,
-    //                 createdTs: number,
-    //                 userId: string,
-    //                 userName: string,
-    //                 walletAddress: string,
-    //             }[] = await GetChat(auth,selectedRoom)
-    //             resp.sort((a,b)=>a.createdTs-b.createdTs)
-    //             setChat(resp)
-    //         }, 5000);
-    //         setIId(intervalId)
-    //     }
-    //     return clearInterval(iId);
-    // },[isTodo,selectedRoom,selectedTodoIndex])
+    useEffect(()=>{
+        clearInterval(iId);
+        if (!isTodo && selectedRoom.length !== 0) {
+            (async()=>{
+                const resp:{
+                    text:string,
+                    createdTs: number,
+                    userId: string,
+                    userName: string,
+                    walletAddress: string,
+                }[] = await GetChat(auth,selectedRoom)
+                resp.sort((a,b)=>a.createdTs-b.createdTs)
+                setChat(resp)
+            })()
+            const intervalId = setInterval(async() => {
+                if (isTodo) {
+                    clearInterval(intervalId)
+                }
+                const resp:{
+                    text:string,
+                    createdTs: number,
+                    userId: string,
+                    userName: string,
+                    walletAddress: string,
+                }[] = await GetChat(auth,selectedRoom)
+                resp.sort((a,b)=>a.createdTs-b.createdTs)
+                setChat(resp)
+            }, 5000);
+            setIId(intervalId)
+        }
+        return clearInterval(iId);
+    },[isTodo,selectedRoom,selectedTodoIndex])
+
+    const doVote = async (voteId:string,choiceId:string,voteIndex:number) => {
+        if (!vote[voteIndex].voted) {
+            const confrim = globalThis.window.confirm("投票しますか？")
+            if (confrim) {
+                await PostVote(auth,voteId,choiceId)
+                toast("投票しました")
+                setShowVoteModal(false)
+            }
+        } else {
+            toast.error("投票済みです")
+        }
+
+    }
 
     return (
     <>
@@ -659,28 +676,35 @@ export default function Home() {
                                                 <span onClick={()=>{setShowVoteModal(true)}}>詳細を表示</span>
                                             </div>
                                             <div className={styles.voteItem}>
-                                                <div className={styles.voteChoice}><span>1.ほげほげほげほげ<div>+</div></span></div>
-                                                <div className={styles.voteChoice}><span>2.ああああああああ<div>+</div></span></div>
-                                                <div className={styles.voteChoice}><span>3.いいいいいいいい<div>+</div></span></div>
+                                                {
+                                                    vote[selectedRoomIndex]?.choice.map((item,index)=>{
+                                                        return <div className={styles.voteChoice} key={item.id}><span>{index+1}.{item.title}</span></div>
+                                                    })
+                                                }
                                             </div>
                                         </div>
                                     }
                                 </div>
                                 {
-                                    showVoteModal&&(<><div className={styles.changeUserNameBg}>
+                                    showVoteModal&&(<><div className={styles.changeUserNameBg} >
                                         <div className={styles.changeUserNameWrapper}>
                                             <div className={styles.closeButtonWrapper}　onClick={()=>{setShowVoteModal(false)}}>
                                                 <div className={styles.closeButton}>
                                                     <AiOutlineClose onClick={()=>{setShowVoteModal(false)}}></AiOutlineClose>
                                                 </div>
                                             </div>
-                                            <div className={styles.changeUserNameModal} style={{height:"520px",overflow:"scroll"}}>
+                                            <div className={styles.changeUserNameModal} style={{height:"300px",overflow:"scroll"}}>
                                                 <div className={styles.changeUserNameHeader}>
                                                     <span>{room!==undefined&&room[selectedRoomIndex].name}</span>
                                                     <span>{(new Date(vote[selectedRoomIndex]?.endTs)).toLocaleDateString() + " " + new Date(vote[selectedRoomIndex]?.endTs).toLocaleTimeString()}</span>
                                                 </div>
                                                 <div className={styles.body}>
                                                     <p>{vote[selectedRoomIndex]?.text}</p>
+                                                    {
+                                                        vote[selectedRoomIndex]?.choice.map((item,index)=>{
+                                                            return <div className={vote[selectedRoomIndex].votedId === item.id ? styles.voteChoice+ " " +styles.VoteSelected:styles.voteChoice} key={item.id} onClick={()=>{doVote(vote[selectedRoomIndex].id,item.id,selectedRoomIndex)}}><span>{index+1}.{item.title}</span></div>
+                                                        })
+                                                    }
                                                 </div>
                                             </div>
                                         </div></div></>)
