@@ -32,6 +32,8 @@ import {useChangeTodo} from "@/src/functions/chat/changeTodo";
 import {GetChat} from "@/src/functions/chat/getChat";
 import {PostChat} from "@/src/functions/chat/postChat";
 import {PostVote} from "@/src/functions/chat/postVote";
+import {Simulate} from "react-dom/test-utils";
+import load = Simulate.load;
 export default function Home() {
     const auth = useContext(AuthContext)
     const loading = useContext(LoadingContext)
@@ -166,6 +168,7 @@ export default function Home() {
 
     const addMember = async () => {
         if (addMemberWalletAddress.length !== 0) {
+            loading.setLoading(true)
             try {
                 const message = await addMemberFunc(auth,selectedOrg,addMemberWalletAddress)
                 // @ts-ignore
@@ -183,40 +186,52 @@ export default function Home() {
             } catch {
                 toast.error("失敗しました")
             }
-
+            loading.setLoading(false)
         }
     }
 
     const addTodo = async () => {
         if (todoTitle.length !== 0&& todoDescription.length !==0) {
-            const resp = await addTodoFunc(auth,selectedOrg,todoTitle,todoDescription,todoPoint)
-            toast("追加しました")
-            const todoList = todo
-            todoList?.push({
-                id: resp.id,
-                title:todoTitle,
-                status: 0,
-                description:todoDescription,
-                point: todoPoint,
-                userId: ""
-            })
-            setTodo(todoList)
-            setShowAddTodo(false)
+            loading.setLoading(true)
+            try {
+                const resp = await addTodoFunc(auth,selectedOrg,todoTitle,todoDescription,todoPoint)
+                toast("追加しました")
+                const todoList = todo
+                todoList?.push({
+                    id: resp.id,
+                    title:todoTitle,
+                    status: 0,
+                    description:todoDescription,
+                    point: todoPoint,
+                    userId: ""
+                })
+                setTodo(todoList)
+                setShowAddTodo(false)
+            } catch {
+                toast.error("失敗しました")
+            }
+            loading.setLoading(false)
         }
     }
 
     const addRoom = async() => {
         if (roomTitle.length !== 0) {
-            const resp = await addRoomFunc(auth,selectedOrg,roomTitle)
-            toast("作成しました")
-            setShowAddRoom(false)
-            const currentRooms = room
-            currentRooms?.push({
-                id: resp.id,
-                name: roomTitle,
-                isDiscussion: false
-            })
-            setRoom(currentRooms)
+            loading.setLoading(true)
+            try {
+                const resp = await addRoomFunc(auth,selectedOrg,roomTitle)
+                toast("作成しました")
+                setShowAddRoom(false)
+                const currentRooms = room
+                currentRooms?.push({
+                    id: resp.id,
+                    name: roomTitle,
+                    isDiscussion: false
+                })
+                setRoom(currentRooms)
+            } catch {
+                toast.error("失敗しました")
+            }
+            loading.setLoading(false)
         }
     }
 
@@ -240,38 +255,44 @@ export default function Home() {
 
     const addDiscussion = async () => {
         if (roomTitle.length !== 0 && end.length !== 0 && choice.length !== 0) {
-            const endTs = (new Date(end)).getTime()
-            const choiceReq:{id:string,title:string}[] = []
-            choice.forEach(item=>{
-                choiceReq.push({
-                    id: uuidv4(),
-                    title: item
+            loading.setLoading(true)
+            try {
+                const endTs = (new Date(end)).getTime()
+                const choiceReq:{id:string,title:string}[] = []
+                choice.forEach(item=>{
+                    choiceReq.push({
+                        id: uuidv4(),
+                        title: item
+                    })
                 })
-            })
-            const resp = await createDiscussionFunc(auth,selectedOrg,roomTitle,description,choiceReq,endTs)
-            const currentRooms = room
-            currentRooms?.push({
-                id: resp.id,
-                name: roomTitle,
-                isDiscussion: true
-            })
-            // @ts-ignore
-            const accounts = await globalThis.window?.ethereum.request({ method: 'eth_requestAccounts' });
-            //@ts-ignore
-            const web3 = new Web3(globalThis.window?.ethereum)
-            console.log({
-                from: accounts[0],
-                data: resp.message,
-                to: org?.contractAddress
-            })
-            const r = await web3.eth.sendTransaction({
-                from: accounts[0],
-                data: resp.message,
-                to: org?.contractAddress
-            })
-            toast("追加しました")
-            setShowDiscussionForm(false)
-            setRoom(currentRooms)
+                const resp = await createDiscussionFunc(auth,selectedOrg,roomTitle,description,choiceReq,endTs)
+                const currentRooms = room
+                currentRooms?.push({
+                    id: resp.id,
+                    name: roomTitle,
+                    isDiscussion: true
+                })
+                // @ts-ignore
+                const accounts = await globalThis.window?.ethereum.request({ method: 'eth_requestAccounts' });
+                //@ts-ignore
+                const web3 = new Web3(globalThis.window?.ethereum)
+                console.log({
+                    from: accounts[0],
+                    data: resp.message,
+                    to: org?.contractAddress
+                })
+                const r = await web3.eth.sendTransaction({
+                    from: accounts[0],
+                    data: resp.message,
+                    to: org?.contractAddress
+                })
+                toast("追加しました")
+                setShowDiscussionForm(false)
+                setRoom(currentRooms)
+            } catch {
+                toast.error("失敗しました")
+            }
+            loading.setLoading(false)
         }
     }
 
@@ -340,19 +361,25 @@ export default function Home() {
 
     const sendChat = async () => {
         if (inputChatText.length !== 0) {
-            await PostChat(auth,selectedRoom,inputChatText);
-            setInputChatText("")
-            await (async()=>{
-                const resp:{
-                    text:string,
-                    createdTs: number,
-                    userId: string,
-                    userName: string,
-                    walletAddress: string,
-                }[] = await GetChat(auth,selectedRoom)
-                resp.sort((a,b)=>a.createdTs-b.createdTs)
-                setChat(resp)
-            })()
+            loading.setLoading(true)
+            try {
+                await PostChat(auth,selectedRoom,inputChatText);
+                setInputChatText("")
+                await (async()=>{
+                    const resp:{
+                        text:string,
+                        createdTs: number,
+                        userId: string,
+                        userName: string,
+                        walletAddress: string,
+                    }[] = await GetChat(auth,selectedRoom)
+                    resp.sort((a,b)=>a.createdTs-b.createdTs)
+                    setChat(resp)
+                })()
+            } catch {
+                toast.error("失敗しました")
+            }
+            loading.setLoading(false)
         }
     }
 
@@ -395,12 +422,18 @@ export default function Home() {
 
     const doVote = async (voteId:string,choiceId:string,voteIndex:number) => {
         if (!vote[voteIndex].voted) {
-            const confrim = globalThis.window.confirm("投票しますか？")
-            if (confrim) {
-                await PostVote(auth,voteId,choiceId)
-                toast("投票しました")
-                setShowVoteModal(false)
+            loading.setLoading(true)
+            try {
+                const confrim = globalThis.window.confirm("投票しますか？")
+                if (confrim) {
+                    await PostVote(auth,voteId,choiceId)
+                    toast("投票しました")
+                    setShowVoteModal(false)
+                }
+            } catch {
+                toast.error("失敗しました")
             }
+            loading.setLoading(false)
         } else {
             toast.error("投票済みです")
         }
