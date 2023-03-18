@@ -21,7 +21,7 @@ export function useGetVotes(auth:any,setVote:any,room?:{id:string,name:string,is
                     endTs: number
                     roomId: string
                 }[] = []
-                await Promise.all(room?.map(async (item,index)=>{
+               room?.map(async (item,index)=>{
                     if (item.isDiscussion) {
                         const resp = await axios.get(process.env.NEXT_PUBLIC_API_ENDPOINT+"room/vote/?id="+item.id,{
                             headers:{
@@ -45,9 +45,9 @@ export function useGetVotes(auth:any,setVote:any,room?:{id:string,name:string,is
                             roomId: string
                         } = resp.data
                         votePutItem.roomId = item.id
-                        respVote.push(votePutItem)
+                        respVote[index] = votePutItem
                     }
-                }))
+                })
                 setVote(respVote)
             })()
         }
