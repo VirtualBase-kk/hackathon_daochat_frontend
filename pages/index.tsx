@@ -325,29 +325,70 @@ export default function Home() {
         }
     },[selectedTodoIndex])
 
+    const [chat,setChat] = useState<{
+        text:string,
+        createdTs: number,
+        userId: string,
+        userName: string,
+        walletAddress: string,
+    }[]>()
+
     const [inputChatText,setInputChatText] = useState<string>("")
 
     const sendChat = async () => {
         if (inputChatText.length !== 0) {
-            await PostChat(auth,selectedRoom,inputChatText)
+            await PostChat(auth,selectedRoom,inputChatText);
+            setInputChatText("")
+            await (async()=>{
+                const resp:{
+                    text:string,
+                    createdTs: number,
+                    userId: string,
+                    userName: string,
+                    walletAddress: string,
+                }[] = await GetChat(auth,selectedRoom)
+                resp.sort((a,b)=>a.createdTs-b.createdTs)
+                setChat(resp)
+            })()
         }
     }
 
     const [iId,setIId] = useState<any>()
 
-    useEffect(()=>{
-        clearInterval(iId);
-        if (!isTodo && selectedRoom.length !== 0) {
-            const intervalId = setInterval(async() => {
-                if (isTodo) {
-                    clearInterval(intervalId)
-                }
-                const resp = await GetChat(auth,selectedRoom)
-            }, 10000);
-            setIId(intervalId)
-        }
-        return clearInterval(iId);
-    },[isTodo])
+    const [showVoteModal,setShowVoteModal] = useState<boolean>(false)
+
+    // useEffect(()=>{
+    //     clearInterval(iId);
+    //     if (!isTodo && selectedRoom.length !== 0) {
+    //         (async()=>{
+    //             const resp:{
+    //                 text:string,
+    //                 createdTs: number,
+    //                 userId: string,
+    //                 userName: string,
+    //                 walletAddress: string,
+    //             }[] = await GetChat(auth,selectedRoom)
+    //             resp.sort((a,b)=>a.createdTs-b.createdTs)
+    //             setChat(resp)
+    //         })()
+    //         const intervalId = setInterval(async() => {
+    //             if (isTodo) {
+    //                 clearInterval(intervalId)
+    //             }
+    //             const resp:{
+    //                 text:string,
+    //                 createdTs: number,
+    //                 userId: string,
+    //                 userName: string,
+    //                 walletAddress: string,
+    //             }[] = await GetChat(auth,selectedRoom)
+    //             resp.sort((a,b)=>a.createdTs-b.createdTs)
+    //             setChat(resp)
+    //         }, 5000);
+    //         setIId(intervalId)
+    //     }
+    //     return clearInterval(iId);
+    // },[isTodo,selectedRoom,selectedTodoIndex])
 
     return (
     <>
@@ -591,26 +632,31 @@ export default function Home() {
                                 </div>
                                 <div className={styles.chatBodyRightChatSpace}>
                                     <div className={styles.chatBody}>
-                                        <div className={styles.chatItem}>
-                                            <div className={styles.chatItemHeader}>
-                                                <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg("user1", 50) }} /></div>
-                                                <p>issui ikeda</p>
-                                                <span>12:42 PM</span>
-                                            </div>
-                                            <div className={styles.chatItemBody}>
-                                                <p>なるほど。なら予算分配は基本的に活動回数・時間ベースで算出する方がいいかもですね。</p>
-                                            </div>
-                                        </div>
+                                        {
+                                            chat?.map((item,index)=>{
+                                                return <div className={styles.chatItem} key={index}>
+                                                    <div className={styles.chatItemHeader}>
+                                                        <div className={styles.iconWrapper}><div className={styles.icon} dangerouslySetInnerHTML={{ __html: toSvg(item.walletAddress, 50) }} /></div>
+                                                        <p>{item.userName}</p>
+                                                        <span>{(new Date(item.createdTs)).toLocaleDateString()+' ' + (new Date(item.createdTs)).toLocaleTimeString()}</span>
+                                                    </div>
+                                                    <div className={styles.chatItemBody}>
+                                                        <p>{item.text}</p>
+                                                    </div>
+                                                </div>
+                                            })
+                                        }
+
                                     </div>
                                     <div className={styles.chatInput}>
-                                        <input className={styles.chatInputInput} placeholder={"ここにテキストを入力"} onChange={(e)=>{setInputChatText(e.target.value)}}/>
+                                        <input className={styles.chatInputInput} value={inputChatText} placeholder={"ここにテキストを入力"} onChange={(e)=>{setInputChatText(e.target.value)}}/>
                                         <button onClick={()=>{sendChat()}}><BsSend></BsSend></button>
                                     </div>
                                     {
                                         room!==undefined&&room[selectedRoomIndex].isDiscussion&&<div className={styles.vote}>
                                             <div className={styles.voteHeader}>
                                                 <h1>進行中の投票</h1>
-                                                <span>詳細を表示</span>
+                                                <span onClick={()=>{setShowVoteModal(true)}}>詳細を表示</span>
                                             </div>
                                             <div className={styles.voteItem}>
                                                 <div className={styles.voteChoice}><span>1.ほげほげほげほげ<div>+</div></span></div>
@@ -620,6 +666,25 @@ export default function Home() {
                                         </div>
                                     }
                                 </div>
+                                {
+                                    showVoteModal&&(<><div className={styles.changeUserNameBg}>
+                                        <div className={styles.changeUserNameWrapper}>
+                                            <div className={styles.closeButtonWrapper}　onClick={()=>{setShowVoteModal(false)}}>
+                                                <div className={styles.closeButton}>
+                                                    <AiOutlineClose onClick={()=>{setShowVoteModal(false)}}></AiOutlineClose>
+                                                </div>
+                                            </div>
+                                            <div className={styles.changeUserNameModal} style={{height:"520px",overflow:"scroll"}}>
+                                                <div className={styles.changeUserNameHeader}>
+                                                    <span>{room!==undefined&&room[selectedRoomIndex].name}</span>
+                                                    <span>{(new Date(vote[selectedRoomIndex]?.endTs)).toLocaleDateString() + " " + new Date(vote[selectedRoomIndex]?.endTs).toLocaleTimeString()}</span>
+                                                </div>
+                                                <div className={styles.body}>
+                                                    <p>{vote[selectedRoomIndex]?.text}</p>
+                                                </div>
+                                            </div>
+                                        </div></div></>)
+                                }
                             </div>
                         ):(
                             <div className={styles.chatBodyRight}>
