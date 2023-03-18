@@ -650,8 +650,6 @@ export default function Home() {
                                                         })
                                                     }
 
-                                                    <p className={styles.label}>選択肢</p>
-                                                    <input placeholder={"選択肢を入力してください"}  onChange={(e)=>{setRoomTitle(e.target.value)}}/>
                                                     <div className={styles.buttonWrapper}>
                                                         <button className={styles.cancelButton} onClick={()=>{deleteChoice()}}>選択肢を削除</button>
                                                         <button className={styles.cancelButton} onClick={()=>{addChoice()}}>選択肢を追加</button>
