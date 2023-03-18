@@ -678,7 +678,7 @@ export default function Home() {
                             <div className={styles.chatBodyRight}>
                                 <div className={styles.chatBodyRightHeader}>
                                     <BsChat></BsChat>
-                                    <span>{room!==undefined&&room[selectedRoomIndex].name}</span>
+                                    <span>{room!==undefined&&room[selectedRoomIndex]?.name}</span>
                                 </div>
                                 <div className={styles.chatBodyRightChatSpace}>
                                     <div className={styles.chatBody}>
@@ -703,7 +703,7 @@ export default function Home() {
                                         <button onClick={()=>{sendChat()}}><BsSend></BsSend></button>
                                     </div>
                                     {
-                                        room!==undefined&&room[selectedRoomIndex].isDiscussion&&<div className={styles.vote}>
+                                        room!==undefined&&room[selectedRoomIndex]?.isDiscussion&&<div className={styles.vote}>
                                             <div className={styles.voteHeader}>
                                                 <h1>進行中の投票</h1>
                                                 <span onClick={()=>{setShowVoteModal(true)}}>詳細を表示</span>
@@ -728,7 +728,7 @@ export default function Home() {
                                             </div>
                                             <div className={styles.changeUserNameModal} style={{height:"300px",overflow:"scroll"}}>
                                                 <div className={styles.changeUserNameHeader}>
-                                                    <span>{room!==undefined&&room[selectedRoomIndex].name}</span>
+                                                    <span>{room!==undefined&&room[selectedRoomIndex]?.name}</span>
                                                     <span>{(new Date(vote[selectedRoomIndex]?.endTs)).toLocaleDateString() + " " + new Date(vote[selectedRoomIndex]?.endTs).toLocaleTimeString()}</span>
                                                 </div>
                                                 <div className={styles.body}>
@@ -738,6 +738,13 @@ export default function Home() {
                                                             return <div className={vote[selectedRoomIndex].votedId === item.id ? styles.voteChoice+ " " +styles.VoteSelected:styles.voteChoice} key={item.id} onClick={()=>{doVote(vote[selectedRoomIndex].id,item.id,selectedRoomIndex)}}><span>{index+1}.{item.title}</span></div>
                                                         })
                                                     }
+                                                    {
+                                                        vote[selectedRoomIndex]?.endTs < Date.now()  &&  <div className={styles.buttonWrapper}>
+                                                            <button className={styles.cancelButton} style={{width:"200px"}}>結果をコントラクトへアップロード</button>
+                                                        </div>
+                                                    }
+
+
                                                 </div>
                                             </div>
                                         </div></div></>)
