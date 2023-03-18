@@ -34,6 +34,7 @@ import {PostChat} from "@/src/functions/chat/postChat";
 import {PostVote} from "@/src/functions/chat/postVote";
 import {Simulate} from "react-dom/test-utils";
 import load = Simulate.load;
+import {UploadContract} from "@/src/functions/chat/uploadContract.t";
 export default function Home() {
     const auth = useContext(AuthContext)
     const loading = useContext(LoadingContext)
@@ -440,6 +441,27 @@ export default function Home() {
 
     }
 
+    const uploadContract = async (voteId:string) => {
+        loading.setLoading(true)
+        try {
+
+            const message = await UploadContract(auth,voteId)
+            // @ts-ignore
+            const accounts = await globalThis.window?.ethereum.request({ method: 'eth_requestAccounts' });
+            //@ts-ignore
+            const web3 = new Web3(globalThis.window?.ethereum)
+            const r = await web3.eth.sendTransaction({
+                from: accounts[0],
+                data: message,
+                to: org?.contractAddress
+            })
+            toast("コントラクトにアップロードしました")
+        } catch {
+            toast.error("失敗しました")
+        }
+        loading.setLoading(false)
+    }
+
     return (
     <>
       <Head>
@@ -733,12 +755,12 @@ export default function Home() {
                                                     <p>{vote[selectedRoomIndex]?.text}</p>
                                                     {
                                                         vote[selectedRoomIndex]?.choice.map((item,index)=>{
-                                                            return <div className={vote[selectedRoomIndex].votedId === item.id ? styles.voteChoice+ " " +styles.VoteSelected:styles.voteChoice} key={item.id} onClick={()=>{doVote(vote[selectedRoomIndex].id,item.id,selectedRoomIndex)}}><span>{index+1}.{item.title}</span></div>
+                                                            return <div className={vote[selectedRoomIndex].votedId === item.id ? styles.voteChoice+ " " +styles.VoteSelected:styles.voteChoice} key={item.id} onClick={()=>{doVote(vote[selectedRoomIndex].id,item.id,selectedRoomIndex)}}><span>{index+1}.{item.title}{vote[selectedRoomIndex]?.endTs < Date.now()&&"："+vote[selectedRoomIndex].result[item.id]}</span></div>
                                                         })
                                                     }
                                                     {
                                                         vote[selectedRoomIndex]?.endTs < Date.now()  &&  <div className={styles.buttonWrapper}>
-                                                            <button className={styles.cancelButton} style={{width:"200px"}}>結果をコントラクトへアップロード</button>
+                                                            <button className={styles.cancelButton} style={{width:"250px"}} onClick={()=>{uploadContract(vote[selectedRoomIndex].id)}}>結果をコントラクトへアップロード</button>
                                                         </div>
                                                     }
 
